@@ -1,20 +1,16 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: (template/unversioned) → 1.0.0
-Bump rationale: Initial ratification — first concrete constitution replacing the
-unfilled template scaffold (MAJOR baseline establishment).
+Version change: 1.0.0 → 1.1.0
+Bump rationale: Added a new mandatory principle (Light-Theme UI) and materially
+expanded persistence guidance to mandate Entity Framework Core — additive,
+backward-compatible changes (MINOR).
 
 Modified principles:
-- [PRINCIPLE_1_NAME] → I. Type-Safe Full-Stack Architecture
-- [PRINCIPLE_2_NAME] → II. Test-First Discipline (NON-NEGOTIABLE)
-- [PRINCIPLE_3_NAME] → III. Responsive, Cross-Device Experience
-- [PRINCIPLE_4_NAME] → IV. Modern Browser Baseline
-- [PRINCIPLE_5_NAME] → V. Lightweight, Reliable Persistence
+- V. Lightweight, Reliable Persistence (now mandates SQLite via EF Core + EF Core migrations)
 
 Added sections:
-- Technology Stack & Constraints (was [SECTION_2_NAME])
-- Development Workflow & Quality Gates (was [SECTION_3_NAME])
+- VI. Light-Theme User Interface (new principle)
 
 Removed sections: none
 
@@ -77,14 +73,27 @@ maintenance overhead from legacy shims, and lets the team rely on the modern pla
 
 ### V. Lightweight, Reliable Persistence
 
-SQLite MUST be the system of record. Database access MUST go through a single, well-defined
-data-access layer rather than ad-hoc queries scattered across the codebase. All schema
-changes MUST be applied through versioned, repeatable migrations. User input that reaches
-the database MUST use parameterized queries — string-concatenated SQL is prohibited.
+SQLite MUST be the system of record, and it MUST be accessed through Entity Framework Core
+(EF Core) as the single data-access layer — ad-hoc queries scattered across the codebase are
+prohibited. All schema changes MUST be applied through EF Core migrations, which MUST be
+versioned and repeatable. Queries MUST rely on EF Core's parameterization; where raw SQL is
+unavoidable it MUST be parameterized — string-concatenated SQL is prohibited.
 
-**Rationale**: A single embedded database keeps deployment simple, while a disciplined
-access layer, migrations, and parameterized queries protect data integrity and guard
-against SQL injection.
+**Rationale**: A single embedded database keeps deployment simple, while routing all access
+through EF Core provides a typed, disciplined data-access layer whose migrations and
+automatic parameterization protect data integrity and guard against SQL injection.
+
+### VI. Light-Theme User Interface
+
+The user interface MUST use a light theme everywhere; every screen, component, and state MUST
+be designed and rendered against the light theme. A dark theme or alternate color scheme MUST
+NOT be introduced without a constitutional amendment. UI colors MUST be sourced from the
+shared light-theme design tokens rather than hard-coded per component, so the theme stays
+consistent across the product.
+
+**Rationale**: Committing to a single light theme keeps the visual language consistent,
+removes the cost of maintaining and testing multiple themes, and lets contributors build UI
+without ambiguity about which palette to use.
 
 ## Technology Stack & Constraints
 
@@ -92,7 +101,8 @@ The following stack is mandatory unless this constitution is amended:
 
 - **Frontend**: React + TypeScript (TypeScript `strict` mode).
 - **Backend**: .NET 10 (nullable reference types enabled).
-- **Database**: SQLite, accessed via a dedicated data-access layer with versioned migrations.
+- **Database**: SQLite, accessed via Entity Framework Core (EF Core) with EF Core migrations.
+- **UI theme**: light theme across the entire application, driven by shared design tokens.
 - **Browser support**: latest stable Chrome, Edge, Firefox, and Safari only.
 - **Devices**: responsive UI supporting desktop and mobile form factors.
 
@@ -107,7 +117,7 @@ and MUST follow the amendment procedure in Governance.
   surfaced; type errors block merge.
 - **Review**: Every change MUST be reviewed before merge, and the reviewer MUST confirm
   compliance with the principles above (types, tests/coverage, responsive behavior, browser
-  baseline, safe data access).
+  baseline, safe data access via EF Core, light-theme UI).
 - **Responsive verification**: UI changes MUST be checked at mobile and desktop widths
   before approval.
 
@@ -126,4 +136,4 @@ Compliance is verified at review time: pull requests MUST demonstrate adherence 
 principles, and any deviation MUST be explicitly justified and approved. Unjustified
 complexity or violations MUST be rejected.
 
-**Version**: 1.0.0 | **Ratified**: 2026-06-30 | **Last Amended**: 2026-06-30
+**Version**: 1.1.0 | **Ratified**: 2026-06-30 | **Last Amended**: 2026-07-06
