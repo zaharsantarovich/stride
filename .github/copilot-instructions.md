@@ -8,11 +8,11 @@ Regular source code should be added to /src/ folder. Unit tests should be added 
 Project structure:
 - ZSLabs.Stride.Web - frontend
 - ZSLabs.Stride.Api - REST API
-- ZSLabs.Stride.App - contains services under "Services" subfolder
-- ZSLabs.Stride.Domain - contains EF entities under "Entities" subfolder
-- ZSLabs.Stride.Persistence - contains DBContext, migrations, configurations, etc.
+- ZSLabs.Stride.App - includes services under "Services" subfolder
+- ZSLabs.Stride.Domain - includes EF entities under "Entities" subfolder, enums under "Enums" subfolder, etc.
+- ZSLabs.Stride.Persistence - includes DBContext, migrations, configurations, etc.
 
 EF entities should not contain any business logic, only data and constructors.  
 If C# or csproj files were added or updated as a part of the change, run all unit tests.  
 When change is complete, ensure that there is no unused code, using statements, NuGet packages, resources, or files.  
-Always use the latest stable version of NuGet packages.  
+For each added NuGet package and frontend dependency check the latest stable version and use it.
