@@ -10,6 +10,10 @@
 
 ## Clarifications
 
+### Session 2026-07-07
+
+- Q: Is the board a distinct persisted entity, or just a view of a space's tasks? → A: Not a separate entity; the board is the page displayed when a user navigates to a space, rendering that space's tasks in status columns.
+
 ### Session 2026-07-05
 
 - Q: How should tasks be ordered within each status column? → A: Automatic by priority (Critical → Low), then creation date; no manual within-column reordering.
@@ -170,7 +174,7 @@ A user adds comments to tasks and subtasks to discuss the work, and can edit or 
 - **FR-016a**: The system MUST restrict changing a space's Public flag (its public/private status) to the space's author only; other users MUST NOT be able to change it, even for a public space.
 - **FR-017**: The system MUST restrict create, read, update, and delete operations on a private space and its contents to the space's author.
 - **FR-018**: The system MUST NOT create any spaces by default for a new user.
-- **FR-019**: The system MUST associate each space with exactly one board.
+- **FR-019**: The system MUST present each space's tasks on a single board view — the page displayed when a user navigates to that space; the board is not a separately stored entity.
 
 #### Boards & Tasks
 
@@ -212,8 +216,7 @@ A user adds comments to tasks and subtasks to discuss the work, and can edit or 
 ### Key Entities *(include if feature involves data)*
 
 - **User**: A person who can sign in. Has a username and password (required) and an email (optional). Is either the single admin (manages users only) or a regular user (manages spaces, tasks, subtasks, and comments).
-- **Space**: A top-level container that groups planning work. Has a user-entered unique Key, a Name, an Author (the creating user), a Public flag (public vs. private visibility), and a Creation Date. Owns exactly one Board.
-- **Board**: The single work surface belonging to a space. Organizes its tasks into columns by task status.
+- **Space**: A top-level container that groups planning work. Has a user-entered unique Key, a Name, an Author (the creating user), a Public flag (public vs. private visibility), and a Creation Date. Its tasks are shown on a board view (the page displayed when navigating to the space); the board is not a separate entity.
 - **Task**: A unit of work on a board. Required: Title, Author, Status, Priority, Creation Date. Optional: Description, Assignee, Due Date. May own many Subtasks and Comments.
 - **Subtask**: A smaller unit of work belonging to a task. Required: Title, Author, Status, Creation Date. Optional: Description, Assignee, Due Date. May own many Comments.
 - **Comment**: A note attached to a task or a subtask. Required: Author, Content, Creation Date. Owned by exactly one task or subtask.
