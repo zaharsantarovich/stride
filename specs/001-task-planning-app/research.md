@@ -46,8 +46,8 @@ technology choices, and prior repository research (see
 
 ### 7. Testing & coverage
 
-- **Decision**: xUnit.v3 as the test framework and NSubstitute for mocking across all `.NET` test projects. Enforce ≥ 80% aggregate line coverage as a CI gate (constitution Principle II).
-- **Rationale**: User explicitly chose xUnit.v3 + NSubstitute. Coverage floor is constitutionally mandated and non-negotiable.
+- **Decision**: xUnit.v3 as the test framework and NSubstitute for mocking across all `.NET` test projects. Unit tests are authored alongside implementation, and each bug fix ships with a regression test (constitution Principle II); aggregate line coverage MUST be ≥ 80%.
+- **Rationale**: User explicitly chose xUnit.v3 + NSubstitute. Test discipline follows the constitution: tests alongside code, regression tests for fixes, with a ≥ 80% coverage floor.
 - **Alternatives considered**: xUnit v2 / NUnit / Moq — superseded by explicit user choices.
 
 ### 8. UTC storage & local-time display

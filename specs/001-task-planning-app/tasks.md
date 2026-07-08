@@ -8,7 +8,7 @@ description: "Task list for Task Planning Application implementation"
 
 **Prerequisites**: plan.md (required), spec.md (required), research.md, data-model.md, contracts/openapi.yaml
 
-**Tests**: Test tasks ARE included. The project constitution requires xUnit.v3 + NSubstitute with a ≥ 80% aggregate line-coverage CI gate. Per project direction, tests are written **after** the implementation of each unit (not test-first); each user story's implementation tasks precede its test tasks.
+**Tests**: Test tasks ARE included. The project constitution requires automated unit tests written alongside implementation (xUnit.v3 + NSubstitute), and aggregate unit-test line coverage MUST be ≥ 80%. Per project direction, tests are written **after** the implementation of each unit (not test-first); each user story's implementation tasks precede its test tasks.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -37,7 +37,7 @@ description: "Task list for Task Planning Application implementation"
 - [ ] T005 [P] Create `src/ZSLabs.Stride.Api/ZSLabs.Stride.Api.csproj` (ASP.NET Core web project, .NET 10) referencing App
 - [ ] T006 [P] Create the four xUnit.v3 + NSubstitute test projects under `tests/` (`ZSLabs.Stride.Domain.Tests`, `ZSLabs.Stride.App.Tests`, `ZSLabs.Stride.Persistence.Tests`, `ZSLabs.Stride.Api.Tests`) with latest-stable `xunit.v3`, `NSubstitute`, and coverage collector packages, each referencing its production project; add all `src` and `tests` projects to the solution
 - [ ] T007 [P] Scaffold the frontend `src/ZSLabs.Stride.Web` as a Vite + React 19 + TypeScript 6 (strict) app; add latest-stable-within-major `vite@^8`, `tailwindcss@^3`, and `@dnd-kit/*`; pin resolved versions in `package.json`
-- [ ] T008 [P] Configure `.editorconfig`, backend analyzers, and the ≥ 80% coverage gate settings (coverage collection in test projects); configure Tailwind (`tailwind.config.js`, light theme) and TypeScript strict/ESLint in `src/ZSLabs.Stride.Web`
+- [ ] T008 [P] Configure `.editorconfig`, backend analyzers, and coverage collection in test projects (≥ 80% aggregate line coverage); configure Tailwind (`tailwind.config.js`, light theme) and TypeScript strict/ESLint in `src/ZSLabs.Stride.Web`
 
 ---
 
@@ -222,7 +222,7 @@ description: "Task list for Task Planning Application implementation"
 
 - [ ] T066 [P] Verify responsive board/space/user layouts at mobile and desktop widths (Tailwind breakpoints, touch targets) in `src/ZSLabs.Stride.Web/`
 - [ ] T067 [P] Confirm all displayed dates use the UTC→local utility across pages/components in `src/ZSLabs.Stride.Web/`
-- [ ] T068 Run all .NET unit tests and confirm ≥ 80% aggregate line coverage (CI gate)
+- [ ] T068 Run all .NET unit tests and confirm ≥ 80% aggregate line coverage
 - [ ] T069 Remove unused code, using statements, NuGet packages, frontend dependencies, resources, and files across the solution
 - [ ] T070 Execute `quickstart.md` end-to-end validation (setup + full user journey)
 

@@ -22,7 +22,7 @@ Technical approach: a typed full-stack web application — a React + TypeScript 
 
 **Storage**: SQLite as system of record, accessed exclusively through EF Core with versioned EF Core migrations. All entities use autoincrementing integer primary keys. All `DateTime` fields stored in UTC.
 
-**Testing**: xUnit.v3 with NSubstitute for the .NET solution; aggregate unit-test line coverage MUST be ≥ 80% (CI gate).
+**Testing**: xUnit.v3 with NSubstitute for the .NET solution; unit tests authored alongside implementation, with a regression test accompanying each bug fix. Aggregate unit-test line coverage MUST be ≥ 80%.
 
 **Target Platform**: Modern browsers only (latest stable Chrome, Edge, Firefox, Safari). Backend runs cross-platform (.NET 10). Local development: frontend and API run on `localhost` with distinct ports (frontend `http://localhost:5173`, API `https://localhost:7080`); the API is served on its own origin/port, never as an `/api` suffix on the frontend domain.
 
@@ -41,7 +41,7 @@ Technical approach: a typed full-stack web application — a React + TypeScript 
 | # | Principle | Status | Notes |
 |---|-----------|--------|-------|
 | I | Type-Safe Full-Stack Architecture | PASS | React + TypeScript (strict); no plain-JS app source. Backend on .NET 10 with nullable reference types enabled. API request/response shapes typed on both sides (C# DTOs ↔ TS interfaces, kept in sync via contracts). |
-| II | Test-First Discipline (NON-NEGOTIABLE) | PASS | xUnit.v3 + NSubstitute; unit tests authored alongside/before implementation; ≥ 80% aggregate line coverage enforced as CI gate; bug fixes require a failing regression test. |
+| II | Test Discipline (NON-NEGOTIABLE) | PASS | xUnit.v3 + NSubstitute; unit tests authored alongside implementation; ≥ 80% aggregate line coverage; bug fixes require a failing regression test. |
 | III | Responsive, Cross-Device Experience | PASS | Tailwind responsive utilities (fluid layouts, breakpoints, touch-friendly targets); board verified at mobile and desktop widths. |
 | IV | Modern Browser Baseline | PASS | Targets current Chrome/Edge/Firefox/Safari only; no legacy polyfills or obsolete transpile targets (Vite/`esnext`). |
 | V | Lightweight, Reliable Persistence | PASS | SQLite via EF Core as the single data-access layer; versioned EF Core migrations; parameterized queries only (no string-concatenated SQL). |

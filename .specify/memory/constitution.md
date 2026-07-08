@@ -1,23 +1,22 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: 2.0.1 → 2.0.2
-Bump rationale: Editorial refinement — Principle II (Test Discipline) condensed for
-readability with no change to the underlying mandate (80% coverage as a CI-only
-gate, tests alongside implementation, regression tests for bug fixes). Non-semantic
-wording change (PATCH).
+Version change: 2.0.2 -> 3.0.0
+Bump rationale: Governance change — removed the former mandatory threshold while keeping
+automated tests alongside implementation and regression tests for bug fixes. Principle II
+and workflow gates were redefined (MAJOR).
 
 Modified principles:
-- II. Test Discipline (NON-NEGOTIABLE) — condensed wording, meaning unchanged
+- II. Test Discipline (NON-NEGOTIABLE) — removed former threshold mandate
 
 Added sections: none
 
 Removed sections: none
 
 Templates requiring updates:
-- ✅ .specify/templates/plan-template.md (Constitution Check gate is generic; aligned)
-- ✅ .specify/templates/spec-template.md (no principle-specific edits required)
-- ✅ .specify/templates/tasks-template.md (no coverage-specific edits required)
+- OK .specify/templates/plan-template.md (Constitution Check gate is generic; aligned)
+- OK .specify/templates/spec-template.md (no principle-specific edits required)
+- OK .specify/templates/tasks-template.md (no coverage-specific edits required)
 
 Follow-up TODOs: none
 -->
@@ -41,12 +40,11 @@ assumed.
 ### II. Test Discipline (NON-NEGOTIABLE)
 
 Every feature MUST ship with automated unit tests, written alongside implementation rather
-than deferred. Aggregate line coverage MUST be at least 80%, enforced as a CI gate at merge
-time — but the threshold MUST NOT break local builds. Bug fixes MUST include a regression
-test that fails before the fix. Writing tests before code is permitted but not required.
+than deferred. Bug fixes MUST include a regression test that fails before the fix. Writing
+tests before code is permitted but not required.
 
-**Rationale**: A CI-enforced coverage floor keeps quality from eroding without blocking local
-iteration, while writing tests alongside code keeps quality current.
+**Rationale**: Writing tests alongside code keeps quality current, and regression tests make
+bug fixes verifiable instead of assumed.
 
 ### III. Responsive, Cross-Device Experience
 
@@ -110,13 +108,10 @@ and MUST follow the amendment procedure in Governance.
 
 ## Development Workflow & Quality Gates
 
-- **Coverage gate**: CI MUST measure unit-test coverage and fail any change that brings
-  aggregate line coverage below 80%. This gate applies at merge time in CI only; local
-  development builds MUST NOT be broken by the 80% coverage threshold.
 - **Type checks**: CI MUST run TypeScript type checking and the .NET build with warnings
   surfaced; type errors block merge.
 - **Review**: Every change MUST be reviewed before merge, and the reviewer MUST confirm
-  compliance with the principles above (types, tests/coverage, responsive behavior, browser
+  compliance with the principles above (types, tests, responsive behavior, browser
   baseline, safe data access via EF Core, light-theme UI).
 - **Responsive verification**: UI changes MUST be checked at mobile and desktop widths
   before approval.
@@ -136,4 +131,4 @@ Compliance is verified at review time: pull requests MUST demonstrate adherence 
 principles, and any deviation MUST be explicitly justified and approved. Unjustified
 complexity or violations MUST be rejected.
 
-**Version**: 2.0.2 | **Ratified**: 2026-06-30 | **Last Amended**: 2026-07-08
+**Version**: 3.0.0 | **Ratified**: 2026-06-30 | **Last Amended**: 2026-07-08

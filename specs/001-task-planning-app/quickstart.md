@@ -48,7 +48,7 @@ cd src/ZSLabs.Stride.Web
 npm run dev
 ```
 
-## Run tests (constitution gate: ≥ 80% line coverage)
+## Run tests (≥ 80% line coverage)
 
 ```powershell
 dotnet test --collect:"XPlat Code Coverage"
