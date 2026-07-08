@@ -215,11 +215,11 @@ A user adds comments to tasks and subtasks to discuss the work, and can edit or 
 
 ### Key Entities *(include if feature involves data)*
 
-- **User**: A person who can sign in. Has a username and password (required) and an email (optional). Is either the single admin (manages users only) or a regular user (manages spaces, tasks, subtasks, and comments).
-- **Space**: A top-level container that groups planning work. Has a user-entered unique Key, a Name, an Author (the creating user), a Public flag (public vs. private visibility), and a Creation Date. Its tasks are shown on a board view (the page displayed when navigating to the space); the board is not a separate entity.
-- **Task**: A unit of work on a board. Required: Title, Author, Status, Priority, Creation Date. Optional: Description, Assignee, Due Date. May own many Subtasks and Comments.
-- **Subtask**: A smaller unit of work belonging to a task. Required: Title, Author, Status, Creation Date. Optional: Description, Assignee, Due Date. May own many Comments.
-- **Comment**: A note attached to a task or a subtask. Required: Author, Content, Creation Date. Owned by exactly one task or subtask.
+- **User**: A person who can sign in. Has a username and password (required), an email (optional), a Creation Date, and an optional Update Date. Is either the single admin (manages users only) or a regular user (manages spaces, tasks, subtasks, and comments).
+- **Space**: A top-level container that groups planning work. Has a user-entered unique Key, a Name, an Author (the creating user), a Public flag (public vs. private visibility), a Creation Date, and an optional Update Date. Its tasks are shown on a board view (the page displayed when navigating to the space); the board is not a separate entity.
+- **Task**: A unit of work on a board. Required: Title, Author, Status, Priority, Creation Date. Optional: Description, Assignee, Due Date, Update Date. May own many Subtasks and Comments.
+- **Subtask**: A smaller unit of work belonging to a task. Required: Title, Author, Status, Creation Date. Optional: Description, Assignee, Due Date, Update Date. May own many Comments.
+- **Comment**: A note attached to a task or a subtask. Required: Author, Content, Creation Date. Optional: Update Date. Owned by exactly one task or subtask.
 
 ## Success Criteria *(mandatory)*
 
