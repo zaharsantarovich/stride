@@ -423,10 +423,6 @@ components:
       type: string
       enum: [Admin, Regular]
 
-    SpaceVisibility:
-      type: string
-      enum: [Private, Public]
-
     TaskStatus:
       type: string
       enum: [Backlog, Todo, InProgress, Done, Archived]
@@ -482,29 +478,29 @@ components:
 
     Space:
       type: object
-      required: [id, key, name, authorId, visibility, createdAt]
+      required: [id, key, name, authorId, isPublic, createdAt]
       properties:
         id: { type: integer }
         key: { type: string }
         name: { type: string }
         authorId: { type: integer }
-        visibility: { $ref: '#/components/schemas/SpaceVisibility' }
+        isPublic: { type: boolean, description: Public flag; true = public, false = private. }
         createdAt: { type: string, format: date-time, description: ISO-8601 UTC }
 
     CreateSpaceRequest:
       type: object
-      required: [key, name, visibility]
+      required: [key, name, isPublic]
       properties:
         key: { type: string }
         name: { type: string }
-        visibility: { $ref: '#/components/schemas/SpaceVisibility' }
+        isPublic: { type: boolean, description: Public flag; true = public, false = private. }
 
     UpdateSpaceRequest:
       type: object
       properties:
         name: { type: string }
-        visibility:
-          allOf: [ { $ref: '#/components/schemas/SpaceVisibility' } ]
+        isPublic:
+          type: boolean
           description: Author-only; ignored/403 for non-authors.
 
     Task:

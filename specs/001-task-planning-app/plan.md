@@ -69,7 +69,7 @@ specs/[###-feature]/
 src/
 ├── ZSLabs.Stride.Domain/            # EF entities, enums — no business logic
 │   ├── Entities/                    # User, Space, Task, Subtask, Comment
-│   └── Enums/                       # UserRole, SpaceVisibility, TaskStatus, TaskPriority, SubtaskStatus
+│   └── Enums/                       # UserRole, TaskStatus, TaskPriority, SubtaskStatus
 ├── ZSLabs.Stride.Persistence/       # EF Core data-access layer
 │   ├── StrideDbContext.cs
 │   ├── Configurations/              # IEntityTypeConfiguration<T> per entity
