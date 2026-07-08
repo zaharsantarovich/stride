@@ -1,0 +1,610 @@
+openapi: 3.0.3
+info:
+  title: Stride Task Planning API
+  version: 1.0.0
+  description: >
+    REST API for the Stride task planning application. Served on its own origin/port
+    (never as an `/api` suffix on the frontend domain). Local development: API on
+    https://localhost:7080, frontend on http://localhost:5173. Authentication is
+    cookie-based; requests use credentials (cookies) and CORS allows the frontend origin.
+    All timestamps are ISO-8601 UTC; clients convert to local time for display.
+
+servers:
+  - url: https://localhost:7080
+    description: Local development API
+
+tags:
+  - name: Auth
+  - name: Users (Admin)
+  - name: Spaces
+  - name: Tasks
+  - name: Subtasks
+  - name: Comments
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Sign in with username and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Signed in; auth cookie set.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CurrentUser' }
+        '401':
+          description: Invalid credentials (generic message; does not reveal which field was wrong).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Sign out and end the session
+      security: [ { cookieAuth: [] } ]
+      responses:
+        '204': { description: Signed out. }
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get the current signed-in user
+      security: [ { cookieAuth: [] } ]
+      responses:
+        '200':
+          description: Current user.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CurrentUser' }
+        '401': { description: Not authenticated. }
+
+  /users:
+    get:
+      tags: [Users (Admin)]
+      summary: List regular user accounts (admin only)
+      security: [ { cookieAuth: [] } ]
+      responses:
+        '200':
+          description: Users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/User' }
+        '403': { description: Not an admin. }
+    post:
+      tags: [Users (Admin)]
+      summary: Create a regular user account (admin only)
+      security: [ { cookieAuth: [] } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateUserRequest' }
+      responses:
+        '201':
+          description: Created.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '403': { description: Not an admin. }
+        '409': { description: Username already exists. }
+
+  /users/{id}:
+    put:
+      tags: [Users (Admin)]
+      summary: Update a regular user account (admin only)
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateUserRequest' }
+      responses:
+        '200':
+          description: Updated.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '403': { description: Not an admin. }
+        '404': { description: Not found. }
+        '409': { description: Username already exists. }
+
+  /spaces:
+    get:
+      tags: [Spaces]
+      summary: List spaces visible to the current user (own + all public)
+      security: [ { cookieAuth: [] } ]
+      responses:
+        '200':
+          description: Spaces.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Space' }
+    post:
+      tags: [Spaces]
+      summary: Create a space
+      security: [ { cookieAuth: [] } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSpaceRequest' }
+      responses:
+        '201':
+          description: Created.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Space' }
+        '409': { description: Space key already exists. }
+
+  /spaces/{id}:
+    get:
+      tags: [Spaces]
+      summary: Get a space (must be visible to the current user)
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: Space.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Space' }
+        '403': { description: No access (private space, not author). }
+        '404': { description: Not found. }
+    put:
+      tags: [Spaces]
+      summary: Update a space (Visibility/Public flag changeable by author only)
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateSpaceRequest' }
+      responses:
+        '200':
+          description: Updated.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Space' }
+        '403': { description: No access, or non-author attempted to change visibility. }
+        '404': { description: Not found. }
+    delete:
+      tags: [Spaces]
+      summary: Delete a space and all descendants (hard cascade delete)
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '204': { description: Deleted. }
+        '403': { description: No access. }
+        '404': { description: Not found. }
+
+  /spaces/{spaceId}/tasks:
+    get:
+      tags: [Tasks]
+      summary: List a space's tasks (board data; server orders by priority then creation date within status)
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: spaceId, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: Tasks (each may include subtasks and comments).
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Task' }
+        '403': { description: No access. }
+    post:
+      tags: [Tasks]
+      summary: Create a task in the space (defaults status to Backlog)
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: spaceId, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTaskRequest' }
+      responses:
+        '201':
+          description: Created.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+        '403': { description: No access. }
+
+  /tasks/{id}:
+    put:
+      tags: [Tasks]
+      summary: Update a task (title, description, status, priority, assignee, due date)
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateTaskRequest' }
+      responses:
+        '200':
+          description: Updated (last-write-wins).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+        '403': { description: No access. }
+        '404': { description: Not found. }
+    delete:
+      tags: [Tasks]
+      summary: Delete a task and all descendants (hard cascade delete)
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '204': { description: Deleted. }
+        '403': { description: No access. }
+        '404': { description: Not found. }
+
+  /tasks/{id}/status:
+    patch:
+      tags: [Tasks]
+      summary: Change a task's status (drag-and-drop between columns)
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { $ref: '#/components/schemas/TaskStatus' }
+      responses:
+        '200':
+          description: Status updated and persisted.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+        '403': { description: No access. }
+        '404': { description: Not found. }
+
+  /tasks/{taskId}/subtasks:
+    post:
+      tags: [Subtasks]
+      summary: Create a subtask under a task
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: taskId, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSubtaskRequest' }
+      responses:
+        '201':
+          description: Created.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subtask' }
+        '403': { description: No access. }
+
+  /subtasks/{id}:
+    put:
+      tags: [Subtasks]
+      summary: Update a subtask
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateSubtaskRequest' }
+      responses:
+        '200':
+          description: Updated.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subtask' }
+        '403': { description: No access. }
+        '404': { description: Not found. }
+    delete:
+      tags: [Subtasks]
+      summary: Delete a subtask and its comments (hard cascade delete)
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '204': { description: Deleted. }
+        '403': { description: No access. }
+        '404': { description: Not found. }
+
+  /tasks/{taskId}/comments:
+    post:
+      tags: [Comments]
+      summary: Add a comment to a task
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: taskId, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCommentRequest' }
+      responses:
+        '201':
+          description: Created.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Comment' }
+        '403': { description: No access. }
+
+  /subtasks/{subtaskId}/comments:
+    post:
+      tags: [Comments]
+      summary: Add a comment to a subtask
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: subtaskId, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCommentRequest' }
+      responses:
+        '201':
+          description: Created.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Comment' }
+        '403': { description: No access. }
+
+  /comments/{id}:
+    put:
+      tags: [Comments]
+      summary: Edit a comment (author only)
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCommentRequest' }
+      responses:
+        '200':
+          description: Updated.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Comment' }
+        '403': { description: Not the comment's author. }
+        '404': { description: Not found. }
+    delete:
+      tags: [Comments]
+      summary: Delete a comment (author only)
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '204': { description: Deleted. }
+        '403': { description: Not the comment's author. }
+        '404': { description: Not found. }
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: Stride.Auth
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        message: { type: string }
+
+    UserRole:
+      type: string
+      enum: [Admin, Regular]
+
+    SpaceVisibility:
+      type: string
+      enum: [Private, Public]
+
+    TaskStatus:
+      type: string
+      enum: [Backlog, Todo, InProgress, Done, Archived]
+
+    TaskPriority:
+      type: string
+      enum: [Low, Medium, High, Critical]
+
+    SubtaskStatus:
+      type: string
+      enum: [Todo, InProgress, Done]
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string, format: password }
+
+    CurrentUser:
+      type: object
+      required: [id, username, role]
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        email: { type: string, nullable: true }
+        role: { $ref: '#/components/schemas/UserRole' }
+
+    User:
+      type: object
+      required: [id, username, role, createdAt]
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        email: { type: string, nullable: true }
+        role: { $ref: '#/components/schemas/UserRole' }
+        createdAt: { type: string, format: date-time, description: ISO-8601 UTC }
+
+    CreateUserRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string, format: password }
+        email: { type: string, nullable: true }
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        username: { type: string }
+        password: { type: string, format: password, nullable: true, description: If provided, replaces the password. }
+        email: { type: string, nullable: true }
+
+    Space:
+      type: object
+      required: [id, key, name, authorId, visibility, createdAt]
+      properties:
+        id: { type: integer }
+        key: { type: string }
+        name: { type: string }
+        authorId: { type: integer }
+        visibility: { $ref: '#/components/schemas/SpaceVisibility' }
+        createdAt: { type: string, format: date-time, description: ISO-8601 UTC }
+
+    CreateSpaceRequest:
+      type: object
+      required: [key, name, visibility]
+      properties:
+        key: { type: string }
+        name: { type: string }
+        visibility: { $ref: '#/components/schemas/SpaceVisibility' }
+
+    UpdateSpaceRequest:
+      type: object
+      properties:
+        name: { type: string }
+        visibility:
+          allOf: [ { $ref: '#/components/schemas/SpaceVisibility' } ]
+          description: Author-only; ignored/403 for non-authors.
+
+    Task:
+      type: object
+      required: [id, spaceId, title, status, priority, authorId, createdAt]
+      properties:
+        id: { type: integer }
+        spaceId: { type: integer }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/TaskStatus' }
+        priority: { $ref: '#/components/schemas/TaskPriority' }
+        authorId: { type: integer }
+        assigneeId: { type: integer, nullable: true }
+        dueDate: { type: string, format: date-time, nullable: true, description: ISO-8601 UTC }
+        createdAt: { type: string, format: date-time, description: ISO-8601 UTC }
+        updatedAt: { type: string, format: date-time, nullable: true, description: ISO-8601 UTC }
+        subtasks:
+          type: array
+          items: { $ref: '#/components/schemas/Subtask' }
+        comments:
+          type: array
+          items: { $ref: '#/components/schemas/Comment' }
+
+    CreateTaskRequest:
+      type: object
+      required: [title, priority]
+      properties:
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status:
+          allOf: [ { $ref: '#/components/schemas/TaskStatus' } ]
+          description: Optional; defaults to Backlog when omitted.
+        priority: { $ref: '#/components/schemas/TaskPriority' }
+        assigneeId: { type: integer, nullable: true }
+        dueDate: { type: string, format: date-time, nullable: true }
+
+    UpdateTaskRequest:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/TaskStatus' }
+        priority: { $ref: '#/components/schemas/TaskPriority' }
+        assigneeId: { type: integer, nullable: true }
+        dueDate: { type: string, format: date-time, nullable: true }
+
+    Subtask:
+      type: object
+      required: [id, taskId, title, status, authorId, createdAt]
+      properties:
+        id: { type: integer }
+        taskId: { type: integer }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/SubtaskStatus' }
+        authorId: { type: integer }
+        assigneeId: { type: integer, nullable: true }
+        dueDate: { type: string, format: date-time, nullable: true, description: ISO-8601 UTC }
+        createdAt: { type: string, format: date-time, description: ISO-8601 UTC }
+        updatedAt: { type: string, format: date-time, nullable: true, description: ISO-8601 UTC }
+        comments:
+          type: array
+          items: { $ref: '#/components/schemas/Comment' }
+
+    CreateSubtaskRequest:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status:
+          allOf: [ { $ref: '#/components/schemas/SubtaskStatus' } ]
+          description: Optional; defaults to Todo when omitted.
+        assigneeId: { type: integer, nullable: true }
+        dueDate: { type: string, format: date-time, nullable: true }
+
+    UpdateSubtaskRequest:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/SubtaskStatus' }
+        assigneeId: { type: integer, nullable: true }
+        dueDate: { type: string, format: date-time, nullable: true }
+
+    Comment:
+      type: object
+      required: [id, authorId, content, createdAt]
+      properties:
+        id: { type: integer }
+        taskId: { type: integer, nullable: true }
+        subtaskId: { type: integer, nullable: true }
+        authorId: { type: integer }
+        content: { type: string }
+        createdAt: { type: string, format: date-time, description: ISO-8601 UTC }
+        updatedAt: { type: string, format: date-time, nullable: true, description: ISO-8601 UTC }
+
+    CreateCommentRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string }
