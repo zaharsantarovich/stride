@@ -169,8 +169,8 @@ A user adds comments to tasks and subtasks to discuss the work, and can edit or 
 - **FR-012**: Regular users MUST be able to create spaces, specifying whether each space is public or private.
 - **FR-013**: The system MUST require each space to have a Key, Name, Author, Public flag, and Creation Date.
 - **FR-014**: The system MUST require the space Key to be entered by the user and MUST enforce that each Key is unique.
-- **FR-015**: The system MUST make public spaces visible to all users and private spaces visible only to their author.
-- **FR-016**: The system MUST allow any user to perform create, read, update, and delete operations on public spaces and their contents, except for changing the space's Public flag (see FR-016a).
+- **FR-015**: The system MUST make public spaces visible to all regular users and private spaces visible only to their author.
+- **FR-016**: The system MUST allow any regular user to perform create, read, update, and delete operations on public spaces and their contents, except for changing the space's Public flag (see FR-016a).
 - **FR-016a**: The system MUST restrict changing a space's Public flag (its public/private status) to the space's author only; other users MUST NOT be able to change it, even for a public space.
 - **FR-017**: The system MUST restrict create, read, update, and delete operations on a private space and its contents to the space's author.
 - **FR-018**: The system MUST NOT create any spaces by default for a new user.
