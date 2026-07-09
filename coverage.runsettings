@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Exclude>[ZSLabs.Stride.Api]ZSLabs.Stride.Api.Contracts.*,[ZSLabs.Stride.Domain]ZSLabs.Stride.Domain.Entities.*,[ZSLabs.Stride.Api]Program,[ZSLabs.Stride.Api]ZSLabs.Stride.Api.Middleware.ExceptionHandlingMiddleware,[ZSLabs.Stride.Persistence]ZSLabs.Stride.Persistence.DependencyInjection,[ZSLabs.Stride.Persistence]ZSLabs.Stride.Persistence.StrideDbContextFactory</Exclude>
+          <ExcludeByFile>**/Migrations/*.cs</ExcludeByFile>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

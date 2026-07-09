@@ -38,11 +38,27 @@ ScaffoldingReadMe.txt
 
 # dotenv environment variables file
 .env
+.env.*
+
+# Node / frontend
+node_modules/
+dist/
+build/
+coverage/
+*.log
 
 # Others
 ~$*
 *~
 CodeCoverage/
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+
+# Editor settings
+.idea/
+.vscode/
 
 # MSBuild Binary and Structured Log
 *.binlog
@@ -55,3 +71,6 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Visual Studio
+.vs/

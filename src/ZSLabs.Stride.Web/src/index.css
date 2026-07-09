@@ -1,0 +1,27 @@
+@import "./styles/tokens.css";
+
+:root {
+  color: var(--color-stride-ink);
+  background:
+    radial-gradient(circle at top left, rgba(255, 231, 184, 0.7), transparent 32%),
+    linear-gradient(180deg, #fffdf8 0%, #f8f1df 100%);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100svh;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+}

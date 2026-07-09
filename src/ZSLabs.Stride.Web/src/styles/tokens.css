@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-display: "Aptos Display", "Segoe UI", sans-serif;
+  --color-stride-ink: #1d2a31;
+  --color-stride-muted: #54656f;
+  --color-stride-surface: #fffdf8;
+  --color-stride-panel: #fff7e8;
+  --color-stride-panel-strong: #ffe7b8;
+  --color-stride-border: #dccfb4;
+  --color-stride-accent: #1d8f6d;
+  --color-stride-accent-strong: #13664e;
+  --color-stride-danger: #ba4f3b;
+  --shadow-board: 0 18px 60px rgba(29, 42, 49, 0.12);
+}
