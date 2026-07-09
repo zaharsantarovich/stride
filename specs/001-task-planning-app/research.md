@@ -21,9 +21,9 @@ technology choices, and prior repository research (see
 
 ### 3. Frontend stack
 
-- **Decision**: React 19.x + TypeScript 6.x (strict), built with Vite 8.x. Tailwind CSS 3.x for styling (light theme, shared design tokens). dnd-kit for board drag-and-drop. State via React built-ins only (`useState`, `useReducer`, `useContext`).
-- **Rationale**: Constitution mandates React + TypeScript strict and a light theme. User explicitly selected TypeScript v6, Vite v8, Tailwind v3.x, dnd-kit, and React-only state (no Redux/Zustand).
-- **Version note**: Per repo convention, resolve the latest stable within each stated major at scaffold time — TypeScript `^6`, Vite `^8`, Tailwind `^3`. Pin the exact resolved versions in `package.json` when the frontend is created.
+- **Decision**: React 19.x + TypeScript 6.x (strict), built with Vite 8.x. Tailwind CSS 4.x for styling (light theme, shared design tokens; CSS-first config via `@tailwindcss/vite`). dnd-kit for board drag-and-drop. State via React built-ins only (`useState`, `useReducer`, `useContext`).
+- **Rationale**: Constitution mandates React + TypeScript strict and a light theme. User explicitly selected TypeScript v6, Vite v8, dnd-kit, and React-only state (no Redux/Zustand); Tailwind uses the current stable major (v4).
+- **Version note**: Per repo convention, resolve the latest stable within each stated major at scaffold time — TypeScript `^6`, Vite `^8`, Tailwind `^4`. Pin the exact resolved versions in `package.json` when the frontend is created.
 - **Alternatives considered**: Redux/Zustand — explicitly excluded by the user. react-beautiful-dnd — superseded/unmaintained; dnd-kit chosen for modern React support and touch/mobile compatibility (constitution Principle III).
 
 ### 4. Persistence & primary keys

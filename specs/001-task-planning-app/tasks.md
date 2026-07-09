@@ -36,8 +36,8 @@ description: "Task list for Task Planning Application implementation"
 - [ ] T004 [P] Create `src/ZSLabs.Stride.App/ZSLabs.Stride.App.csproj` (.NET 10) referencing Domain and Persistence, with latest-stable `Microsoft.Extensions.Identity.Core` package (provides `PasswordHasher<TUser>`)
 - [ ] T005 [P] Create `src/ZSLabs.Stride.Api/ZSLabs.Stride.Api.csproj` (ASP.NET Core web project, .NET 10) referencing App
 - [ ] T006 [P] Create the four xUnit.v3 + NSubstitute test projects under `tests/` (`ZSLabs.Stride.Domain.Tests`, `ZSLabs.Stride.App.Tests`, `ZSLabs.Stride.Persistence.Tests`, `ZSLabs.Stride.Api.Tests`) with latest-stable `xunit.v3`, `NSubstitute`, and coverage collector packages, each referencing its production project; add all `src` and `tests` projects to the solution
-- [ ] T007 [P] Scaffold the frontend `src/ZSLabs.Stride.Web` as a Vite + React 19 + TypeScript 6 (strict) app; add latest-stable-within-major `vite@^8`, `tailwindcss@^3`, and `@dnd-kit/*`; pin resolved versions in `package.json`
-- [ ] T008 [P] Configure `.editorconfig`, backend analyzers, and coverage collection in test projects (≥ 80% aggregate line coverage); configure Tailwind (`tailwind.config.js`, light theme) and TypeScript strict/ESLint in `src/ZSLabs.Stride.Web`
+- [ ] T007 [P] Scaffold the frontend `src/ZSLabs.Stride.Web` as a Vite + React 19 + TypeScript 6 (strict) app; add latest-stable-within-major `vite@^8`, `tailwindcss@^4`, `@tailwindcss/vite@^4`, and `@dnd-kit/*`; pin resolved versions in `package.json`
+- [ ] T008 [P] Configure `.editorconfig`, backend analyzers, and coverage collection in test projects (≥ 80% aggregate line coverage); configure Tailwind v4 (register `@tailwindcss/vite` in `vite.config.ts`, CSS-first `@import "tailwindcss"` with light-theme `@theme` tokens) and TypeScript strict/ESLint in `src/ZSLabs.Stride.Web`
 
 ---
 

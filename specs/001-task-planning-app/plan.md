@@ -17,7 +17,7 @@ Technical approach: a typed full-stack web application — a React + TypeScript 
 **Primary Dependencies**:
 
 - Backend: ASP.NET Core (REST API), Entity Framework Core 10 (SQLite provider), ASP.NET Core Identity `PasswordHasher<TUser>` for password hashing/verification, cookie-based authentication.
-- Frontend: React 19.x, Vite 8.x (build/dev server), Tailwind CSS 3.x (light theme), dnd-kit (board drag-and-drop). State via React built-ins (`useState`/`useReducer`/`useContext`) — no external state library (no Redux/Zustand).
+- Frontend: React 19.x, Vite 8.x (build/dev server), Tailwind CSS 4.x (light theme; CSS-first config via the `@tailwindcss/vite` plugin), dnd-kit (board drag-and-drop). State via React built-ins (`useState`/`useReducer`/`useContext`) — no external state library (no Redux/Zustand).
 - Testing: xUnit.v3 + NSubstitute (mocking) for .NET unit tests.
 
 **Storage**: SQLite as system of record, accessed exclusively through EF Core with versioned EF Core migrations. All entities use autoincrementing integer primary keys. All `DateTime` fields stored in UTC.
@@ -86,10 +86,9 @@ src/
     │   ├── pages/                   # SignIn, Spaces, SpaceBoard, AdminUsers
     │   ├── api/                     # typed API client + generated/mirrored contract types
     │   ├── hooks/                   # React state hooks (useAuth, useSpaces, ...)
-    │   └── styles/                  # Tailwind entry + design tokens
+    │   └── styles/                  # Tailwind entry (@import "tailwindcss") + design tokens (@theme)
     ├── index.html
-    ├── vite.config.ts
-    ├── tailwind.config.js
+    ├── vite.config.ts               # registers @tailwindcss/vite plugin
     └── package.json
 
 tests/
