@@ -1,13 +1,13 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: 2.0.2 -> 3.0.0
-Bump rationale: Governance change — removed the former mandatory threshold while keeping
-automated tests alongside implementation and regression tests for bug fixes. Principle II
-and workflow gates were redefined (MAJOR).
+Version change: 3.0.0 -> 3.1.0
+Bump rationale: Added a new mandatory quality target in Principle II (>= 80% aggregate
+unit-test line coverage) and clarified that coverage is not a CI merge gate (MINOR).
 
 Modified principles:
-- II. Test Discipline (NON-NEGOTIABLE) — removed former threshold mandate
+- II. Test Discipline (NON-NEGOTIABLE) — added >= 80% aggregate unit-test line coverage
+  requirement and explicit no-CI-coverage-gate rule
 
 Added sections: none
 
@@ -15,8 +15,10 @@ Removed sections: none
 
 Templates requiring updates:
 - OK .specify/templates/plan-template.md (Constitution Check gate is generic; aligned)
-- OK .specify/templates/spec-template.md (no principle-specific edits required)
-- OK .specify/templates/tasks-template.md (no coverage-specific edits required)
+- OK .specify/templates/spec-template.md (testing remains mandatory at the story/scenario
+  level)
+- OK .specify/templates/tasks-template.md (updated: tests no longer optional; added coverage
+  target guidance without CI gate requirement)
 
 Follow-up TODOs: none
 -->
@@ -40,8 +42,10 @@ assumed.
 ### II. Test Discipline (NON-NEGOTIABLE)
 
 Every feature MUST ship with automated unit tests, written alongside implementation rather
-than deferred. Bug fixes MUST include a regression test that fails before the fix. Writing
-tests before code is permitted but not required.
+than deferred. Bug fixes MUST include a regression test that fails before the fix. Aggregate
+unit-test line coverage across the solution MUST be >= 80%. This coverage threshold is a
+required quality target, but it MUST NOT be enforced as a CI merge-blocking coverage gate.
+Writing tests before code is permitted but not required.
 
 **Rationale**: Writing tests alongside code keeps quality current, and regression tests make
 bug fixes verifiable instead of assumed.
@@ -131,4 +135,4 @@ Compliance is verified at review time: pull requests MUST demonstrate adherence 
 principles, and any deviation MUST be explicitly justified and approved. Unjustified
 complexity or violations MUST be rejected.
 
-**Version**: 3.0.0 | **Ratified**: 2026-06-30 | **Last Amended**: 2026-07-08
+**Version**: 3.1.0 | **Ratified**: 2026-06-30 | **Last Amended**: 2026-07-09
