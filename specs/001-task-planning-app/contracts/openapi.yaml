@@ -5,7 +5,7 @@ info:
   description: >
     REST API for the Stride task planning application. Served on its own origin/port
     (never as an `/api` suffix on the frontend domain). Local development: API on
-    https://localhost:7080, frontend on http://localhost:5173. Authentication is
+    https://localhost:7080, frontend on https://localhost:5173. Authentication is
     cookie-based; requests use credentials (cookies) and CORS allows the frontend origin.
     All timestamps are ISO-8601 UTC; clients convert to local time for display.
 

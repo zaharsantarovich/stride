@@ -45,6 +45,7 @@ node_modules/
 dist/
 build/
 coverage/
+certs/
 *.log
 
 # Others

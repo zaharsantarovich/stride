@@ -66,7 +66,7 @@ description: "Task list for Task Planning Application implementation"
 
 ### Backend cross-cutting infrastructure
 
-- [X] T020 Register services, DbContext, cookie authentication scheme, CORS (allow `http://localhost:5173` with credentials), and authorization policies `AdminOnly` / `RegularOnly` in `src/ZSLabs.Stride.Api/Program.cs`
+- [X] T020 Register services, DbContext, cookie authentication scheme, CORS (allow `https://localhost:5173` with credentials), and authorization policies `AdminOnly` / `RegularOnly` in `src/ZSLabs.Stride.Api/Program.cs`
 - [X] T021 [P] Add password hashing wrapper over `PasswordHasher<User>` in `src/ZSLabs.Stride.App/Services/PasswordHashingService.cs` (+ unit test in `tests/ZSLabs.Stride.App.Tests/`)
 - [X] T022 [P] Add global error-handling / problem-details middleware and generic error contract in `src/ZSLabs.Stride.Api/`
 - [X] T023 Add admin user seeding (single seeded `Admin`) on startup in `src/ZSLabs.Stride.Persistence/` (idempotent) and invoke from `Program.cs`

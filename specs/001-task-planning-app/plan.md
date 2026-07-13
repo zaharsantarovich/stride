@@ -8,7 +8,7 @@
 
 A task planning application for personal and family usage. Regular users organize work into private/public **Spaces**; each space renders a single **board** view with always-visible status columns (Backlog, Todo, In Progress, Done, Archived). Users create **Tasks** (with priority-based auto-ordering within columns), break them into **Subtasks**, and add **Comments**; drag-and-drop moves a task between columns to change its status. A single seeded **admin** user manages regular user accounts only. Deletes are hard/cascade, all dates are stored in UTC and shown in the viewer's local time, and concurrent edits in shared public spaces use last-write-wins.
 
-Technical approach: a typed full-stack web application — a React + TypeScript SPA (Vite build, Tailwind CSS light theme, dnd-kit for board drag-and-drop, React built-in state) talking over HTTP to an ASP.NET Core REST API on .NET 10. The API is layered into Domain (EF entities/enums), Persistence (EF Core + SQLite + migrations), App (services), and Api (controllers/DTOs). Passwords are hashed with ASP.NET Core Identity `PasswordHasher<TUser>`; all primary keys are autoincrementing integers.
+Technical approach: a typed full-stack web application — a React + TypeScript SPA (Vite build/dev server over HTTPS, Tailwind CSS light theme, dnd-kit for board drag-and-drop, React built-in state) talking over HTTPS to an ASP.NET Core REST API on .NET 10. The API is layered into Domain (EF entities/enums), Persistence (EF Core + SQLite + migrations), App (services), and Api (controllers/DTOs). Passwords are hashed with ASP.NET Core Identity `PasswordHasher<TUser>`; all primary keys are autoincrementing integers.
 
 ## Technical Context
 
@@ -24,7 +24,7 @@ Technical approach: a typed full-stack web application — a React + TypeScript 
 
 **Testing**: xUnit.v3 with NSubstitute for the .NET solution; unit tests authored alongside implementation, with a regression test accompanying each bug fix. Aggregate unit-test line coverage MUST be ≥ 80%.
 
-**Target Platform**: Modern browsers only (latest stable Chrome, Edge, Firefox, Safari). Backend runs cross-platform (.NET 10). Local development: frontend and API run on `localhost` with distinct ports (frontend `http://localhost:5173`, API `https://localhost:7080`); the API is served on its own origin/port, never as an `/api` suffix on the frontend domain.
+**Target Platform**: Modern browsers only (latest stable Chrome, Edge, Firefox, Safari). Backend runs cross-platform (.NET 10). Local development: frontend and API run over HTTPS on `localhost` with distinct ports (frontend `https://localhost:5173`, API `https://localhost:7080`); the API is served on its own origin/port, never as an `/api` suffix on the frontend domain. The frontend dev server reuses the ASP.NET Core HTTPS development certificate by exporting it to `src/ZSLabs.Stride.Web/certs/` on launch when the PEM files do not already exist.
 
 **Project Type**: Web application (React SPA frontend + ASP.NET Core REST API backend).
 
@@ -98,7 +98,7 @@ tests/
 └── ZSLabs.Stride.Api.Tests/         # controller unit tests
 ```
 
-**Structure Decision**: Web application with a layered .NET backend and a React SPA frontend. Backend projects follow the mandated `ZSLabs.Stride.*` prefix and layering (Domain → Persistence → App → Api), with entities kept free of business logic. Source lives under `/src/`, unit tests under `/tests/` (one test project per production project). The frontend (`ZSLabs.Stride.Web`) is a standalone Vite app served on its own localhost port and deployed on its own origin, communicating with the API over typed HTTP contracts.
+**Structure Decision**: Web application with a layered .NET backend and a React SPA frontend. Backend projects follow the mandated `ZSLabs.Stride.*` prefix and layering (Domain → Persistence → App → Api), with entities kept free of business logic. Source lives under `/src/`, unit tests under `/tests/` (one test project per production project). The frontend (`ZSLabs.Stride.Web`) is a standalone Vite app served over HTTPS on its own localhost port and deployed on its own origin, communicating with the API over typed HTTPS contracts.
 
 ## Complexity Tracking
 

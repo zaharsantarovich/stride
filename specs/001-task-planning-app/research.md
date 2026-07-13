@@ -38,10 +38,10 @@ technology choices, and prior repository research (see
 - **Rationale**: User explicitly chose `PasswordHasher<TUser>`. Cookies suit a first-party SPA + same-owner API and avoid token storage in JS (reduces XSS token theft risk). The admin/regular split is enforced by authorization policies per FR-003–FR-005.
 - **Alternatives considered**: JWT bearer tokens — heavier and requires client-side token storage; unnecessary for a first-party small-scale app. Full ASP.NET Core Identity stack — heavier than needed; only the password hasher component is required, with a custom lightweight user store.
 
-### 6. API hosting / origins & CORS
+### 6. API hosting / origins, HTTPS & CORS
 
-- **Decision**: The REST API is served on its own origin/port, never as an `/api` suffix on the frontend domain. Local development: frontend on `http://localhost:5173` (Vite), API on `https://localhost:7080`. CORS on the API allows the frontend origin with credentials enabled (for the auth cookie).
-- **Rationale**: User explicitly requested distinct domains (no `/api` suffix) and distinct localhost ports for frontend vs. API in local dev.
+- **Decision**: The REST API is served on its own origin/port, never as an `/api` suffix on the frontend domain. Local development: frontend on `https://localhost:5173` (Vite), API on `https://localhost:7080`. The Vite dev server uses the ASP.NET Core HTTPS development certificate, exported on frontend launch into `src/ZSLabs.Stride.Web/certs/` when the local PEM files do not already exist. CORS on the API allows the HTTPS frontend origin with credentials enabled (for the auth cookie).
+- **Rationale**: User explicitly requested distinct domains (no `/api` suffix), distinct localhost ports for frontend vs. API in local dev, and reuse of the ASP.NET Core HTTPS development certificate for the frontend website.
 - **Alternatives considered**: Reverse-proxy `/api` path on one domain — rejected per explicit user instruction.
 
 ### 7. Testing & coverage

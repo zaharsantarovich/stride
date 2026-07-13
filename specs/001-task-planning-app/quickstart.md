@@ -18,12 +18,14 @@ end-to-end. It references the [data model](./data-model.md) and the
 
 ## Local URLs & ports
 
-- Frontend (Vite dev server): `http://localhost:5173`
+- Frontend (Vite dev server): `https://localhost:5173`
 - REST API: `https://localhost:7080`
 
 The API runs on its own origin/port — it is **not** exposed as an `/api` suffix on the
 frontend domain. The API enables CORS for the frontend origin with credentials so the
-auth cookie flows.
+auth cookie flows. On launch, the frontend dev server exports/reuses the ASP.NET Core
+HTTPS development certificate into `src/ZSLabs.Stride.Web/certs/` if the local PEM files
+do not already exist.
 
 ## First-time setup
 
@@ -43,7 +45,7 @@ npm install
 # Terminal 1 — API on https://localhost:7080
 dotnet run --project src/ZSLabs.Stride.Api
 
-# Terminal 2 — frontend on http://localhost:5173
+# Terminal 2 — frontend on https://localhost:5173
 cd src/ZSLabs.Stride.Web
 npm run dev
 ```
