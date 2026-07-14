@@ -17,6 +17,8 @@
 - Q: How should modal saves handle concurrent task updates? → A: Last save wins; the modal save overwrites the latest task state using existing save behavior.
 - Q: What responsive threshold and desktop dimensions should the task modal use? → A: Full-screen below 768px; centered at 768px and wider with max 90vw, max 90vh, and max width 960px.
 - Q: How should task cards display many subtasks? → A: Show all subtask titles on the card in a compact read-only list; the board or column scrolls as needed.
+- Q: Who can be assigned to tasks and subtasks from the modal? → A: In a private space, only the current user can be assigned; in a public space, any regular user can be assigned.
+- Q: Should frontend unit tests be added for this modal feature? → A: No frontend unit tests should be added; use backend unit tests for assignment rules and frontend build/responsive validation for the UI.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -110,12 +112,17 @@ A board user can comfortably create and edit tasks on both mobile and desktop de
 - **FR-013**: The board MUST continue to support existing non-editing board interactions, including status movement, without requiring inline task or subtask editing controls.
 - **FR-014**: The task modal MUST clearly communicate save failures and keep the user's unsaved entries available for correction or retry.
 - **FR-015**: The task modal MUST support full subtask management using existing subtask validation and behavior.
+- **FR-016**: In a private space, the task modal MUST allow only the current user to be selected as the assignee for tasks and subtasks.
+- **FR-017**: In a public space, the task modal MUST allow any regular user to be selected as the assignee for tasks and subtasks.
+- **FR-018**: The system MUST reject task or subtask saves that provide an assignee outside the eligible users for the task's space.
 
 ### Key Entities *(include if feature involves data)*
 
 - **Task**: A work item shown on the board. Key visible attributes for this feature include title, priority, assignee, and subtasks.
 - **Subtask**: A smaller work item belonging to a task. Its title appears as read-only summary information on the board, and it can be managed through the task modal.
 - **Assignee**: The user assigned to a task. The board displays this user's username when a task is assigned.
+- **Eligible Assignee**: A user who can be assigned to a task or subtask in the current space. In private spaces this is only the current user; in public spaces this is any regular user.
+- **Regular User Lookup**: A generic list of regular users used by the modal to populate public-space assignee selectors.
 
 ## Success Criteria *(mandatory)*
 
@@ -133,3 +140,4 @@ A board user can comfortably create and edit tasks on both mobile and desktop de
 - Existing task fields, validation rules, priorities, assignees, subtasks, and status behavior remain in scope; this feature changes where task creation and editing happen, not the underlying task model.
 - Unassigned tasks may exist; in that case, the board should present a clear non-editable unassigned state instead of a username.
 - Existing board movement behavior is treated as a status change interaction, not inline task editing.
+- Admin users are not assignable to tasks or subtasks.

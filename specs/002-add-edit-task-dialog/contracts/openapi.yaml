@@ -1,0 +1,253 @@
+openapi: 3.0.3
+info:
+  title: Stride Task Modal Editing API
+  version: 1.0.0
+  description: >
+    Feature-level REST contracts for the task modal editing flow. Authentication is
+    cookie-based. All timestamps are ISO-8601 UTC. Clients convert timestamps to local
+    time for display.
+
+servers:
+  - url: https://localhost:7080
+    description: Local development API
+
+tags:
+  - name: Users
+  - name: Spaces
+  - name: Tasks
+  - name: Subtasks
+
+paths:
+  /regular-users:
+    get:
+      tags: [Users]
+      summary: List regular users for public-space assignment controls
+      description: >
+        Returns all regular users ordered by username. The endpoint is not scoped to a
+        space. Private-space task and subtask assignment controls use the current signed-in
+        user only; public-space controls may use this list. Admin users are never returned.
+      security: [ { cookieAuth: [] } ]
+      responses:
+        '200':
+          description: Regular users ordered by username.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/RegularUserLookup' }
+        '401': { description: Not authenticated. }
+
+  /spaces/{spaceId}/tasks:
+    post:
+      tags: [Tasks]
+      summary: Create a task from the task modal
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: spaceId, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTaskRequest' }
+      responses:
+        '201':
+          description: Created task with subtasks and comments included as currently supported by the API.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+        '400': { description: Request validation failed. }
+        '403': { description: Current user cannot access the space. }
+        '409': { description: Assignee is not eligible for this space. }
+
+  /tasks/{taskId}:
+    put:
+      tags: [Tasks]
+      summary: Update a task from the task modal
+      description: Last save wins; a successful request overwrites the current persisted task fields.
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: taskId, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateTaskRequest' }
+      responses:
+        '200':
+          description: Updated task.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+        '400': { description: Request validation failed. }
+        '403': { description: Current user cannot access the task's space. }
+        '404': { description: Task not found. }
+        '409': { description: Assignee is not eligible for this space. }
+
+  /tasks/{taskId}/subtasks:
+    post:
+      tags: [Subtasks]
+      summary: Create a subtask from the task modal
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: taskId, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSubtaskRequest' }
+      responses:
+        '201':
+          description: Created subtask.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subtask' }
+        '400': { description: Request validation failed. }
+        '403': { description: Current user cannot access the parent task's space. }
+        '404': { description: Parent task not found. }
+        '409': { description: Assignee is not eligible for this space. }
+
+  /subtasks/{subtaskId}:
+    put:
+      tags: [Subtasks]
+      summary: Update a subtask from the task modal
+      security: [ { cookieAuth: [] } ]
+      parameters:
+        - { name: subtaskId, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateSubtaskRequest' }
+      responses:
+        '200':
+          description: Updated subtask.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subtask' }
+        '400': { description: Request validation failed. }
+        '403': { description: Current user cannot access the parent task's space. }
+        '404': { description: Subtask not found. }
+        '409': { description: Assignee is not eligible for this space. }
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: Stride.Auth
+
+  schemas:
+    TaskStatus:
+      type: string
+      enum: [Backlog, Todo, InProgress, Done, Archived]
+
+    TaskPriority:
+      type: string
+      enum: [Low, Medium, High, Critical]
+
+    SubtaskStatus:
+      type: string
+      enum: [Todo, InProgress, Done]
+
+    RegularUserLookup:
+      type: object
+      required: [id, username]
+      properties:
+        id: { type: integer }
+        username: { type: string }
+
+    Task:
+      type: object
+      required: [id, spaceId, title, status, priority, authorId, createdAt]
+      properties:
+        id: { type: integer }
+        spaceId: { type: integer }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/TaskStatus' }
+        priority: { $ref: '#/components/schemas/TaskPriority' }
+        authorId: { type: integer }
+        assigneeId:
+          type: integer
+          nullable: true
+          description: Must be null, the current user in private spaces, or any regular user in public spaces.
+        dueDate: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time, nullable: true }
+        subtasks:
+          type: array
+          items: { $ref: '#/components/schemas/Subtask' }
+
+    Subtask:
+      type: object
+      required: [id, taskId, title, status, authorId, createdAt]
+      properties:
+        id: { type: integer }
+        taskId: { type: integer }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/SubtaskStatus' }
+        authorId: { type: integer }
+        assigneeId:
+          type: integer
+          nullable: true
+          description: Must be null, the current user in private spaces, or any regular user in public spaces.
+        dueDate: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time, nullable: true }
+
+    CreateTaskRequest:
+      type: object
+      required: [title, priority]
+      properties:
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status:
+          allOf: [ { $ref: '#/components/schemas/TaskStatus' } ]
+          description: Optional; defaults to Backlog when omitted.
+        priority: { $ref: '#/components/schemas/TaskPriority' }
+        assigneeId:
+          type: integer
+          nullable: true
+          description: Null for unassigned, current user only in private spaces, any regular user in public spaces.
+        dueDate: { type: string, format: date-time, nullable: true }
+
+    UpdateTaskRequest:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/TaskStatus' }
+        priority: { $ref: '#/components/schemas/TaskPriority' }
+        assigneeId:
+          type: integer
+          nullable: true
+          description: Null for unassigned, current user only in private spaces, any regular user in public spaces.
+        dueDate: { type: string, format: date-time, nullable: true }
+
+    CreateSubtaskRequest:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status:
+          allOf: [ { $ref: '#/components/schemas/SubtaskStatus' } ]
+          description: Optional; defaults to Todo when omitted.
+        assigneeId:
+          type: integer
+          nullable: true
+          description: Null for unassigned, current user only in private spaces, any regular user in public spaces.
+        dueDate: { type: string, format: date-time, nullable: true }
+
+    UpdateSubtaskRequest:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/SubtaskStatus' }
+        assigneeId:
+          type: integer
+          nullable: true
+          description: Null for unassigned, current user only in private spaces, any regular user in public spaces.
+        dueDate: { type: string, format: date-time, nullable: true }
