@@ -10,6 +10,29 @@ namespace ZSLabs.Stride.App.Tests;
 public class UserServiceTests
 {
     [Fact]
+    public async global::System.Threading.Tasks.Task GetRegularUsersAsyncExcludesAdminsAndOrdersByUsername()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        context.Users.AddRange(
+            new User("zoe", "hash", null, UserRole.Regular, DateTime.UtcNow),
+            new User("admin", "hash", null, UserRole.Admin, DateTime.UtcNow),
+            new User("anna", "hash", null, UserRole.Regular, DateTime.UtcNow));
+        await context.SaveChangesAsync(cancellationToken);
+
+        var service = new UserService(context, new PasswordHashingService());
+
+        var users = await service.GetRegularUsersAsync(cancellationToken);
+
+        Assert.Equal(["anna", "zoe"], users.Select(user => user.Username));
+        Assert.All(users, user => Assert.Equal(UserRole.Regular, user.Role));
+    }
+
+    [Fact]
     public async global::System.Threading.Tasks.Task CreateRegularUserAsyncPersistsHashedUser()
     {
         var cancellationToken = TestContext.Current.CancellationToken;

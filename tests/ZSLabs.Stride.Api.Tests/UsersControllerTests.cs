@@ -15,12 +15,54 @@ namespace ZSLabs.Stride.Api.Tests;
 public class UsersControllerTests
 {
     [Fact]
-    public void ControllerRequiresAdminOnlyPolicy()
+    public void UserManagementActionsRequireAdminOnlyPolicy()
     {
-        var attribute = typeof(UsersController).GetCustomAttribute<AuthorizeAttribute>();
+        var getAttribute = typeof(UsersController)
+            .GetMethod(nameof(UsersController.GetAsync))!
+            .GetCustomAttribute<AuthorizeAttribute>();
+        var createAttribute = typeof(UsersController)
+            .GetMethod(nameof(UsersController.CreateAsync))!
+            .GetCustomAttribute<AuthorizeAttribute>();
+        var updateAttribute = typeof(UsersController)
+            .GetMethod(nameof(UsersController.UpdateAsync))!
+            .GetCustomAttribute<AuthorizeAttribute>();
+
+        Assert.Equal("AdminOnly", getAttribute?.Policy);
+        Assert.Equal("AdminOnly", createAttribute?.Policy);
+        Assert.Equal("AdminOnly", updateAttribute?.Policy);
+    }
+
+    [Fact]
+    public void RegularUserLookupRequiresRegularOnlyPolicy()
+    {
+        var attribute = typeof(UsersController)
+            .GetMethod(nameof(UsersController.GetRegularUsersAsync))!
+            .GetCustomAttribute<AuthorizeAttribute>();
 
         Assert.NotNull(attribute);
-        Assert.Equal("AdminOnly", attribute.Policy);
+        Assert.Equal("RegularOnly", attribute.Policy);
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task GetRegularUsersAsyncReturnsLookupContracts()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var userService = Substitute.For<IUserService>();
+        userService.GetRegularUsersAsync(cancellationToken).Returns([
+            new DomainUser("anna", "hash", null, UserRole.Regular, DateTime.UtcNow) { Id = 3 },
+            new DomainUser("zoe", "hash", null, UserRole.Regular, DateTime.UtcNow) { Id = 5 }
+        ]);
+
+        var controller = new UsersController(userService);
+
+        var result = await controller.GetRegularUsersAsync(cancellationToken);
+
+        var ok = Assert.IsType<OkObjectResult>(result.Result);
+        var payload = Assert.IsAssignableFrom<IReadOnlyList<RegularUserLookup>>(ok.Value);
+        Assert.Collection(
+            payload,
+            user => Assert.Equal(new RegularUserLookup(3, "anna"), user),
+            user => Assert.Equal(new RegularUserLookup(5, "zoe"), user));
     }
 
     [Fact]

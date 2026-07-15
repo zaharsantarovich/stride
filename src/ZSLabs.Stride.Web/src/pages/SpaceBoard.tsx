@@ -1,23 +1,28 @@
 import { useEffect, useState } from 'react'
-import type { FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import type { CreateTaskRequest, Space, TaskPriority } from '../api/contracts'
+import type { CreateTaskRequest, RegularUserLookup, Space, Task, UpdateTaskRequest } from '../api/contracts'
 import { getSpace } from '../api/spaces'
+import { getRegularUsers } from '../api/users'
 import { Board } from '../components/Board'
+import { TaskModal } from '../components/TaskModal'
 import { useAuth } from '../hooks/useAuth'
+import type { SubtaskDraftSave } from '../hooks/useTasks'
 import { useTasks } from '../hooks/useTasks'
 
-const priorities: TaskPriority[] = ['Critical', 'High', 'Medium', 'Low']
+type ModalState =
+  | { mode: 'create'; task: null }
+  | { mode: 'edit'; task: Task }
 
 export function SpaceBoardPage() {
   const navigate = useNavigate()
   const { spaceId } = useParams()
   const parsedSpaceId = Number(spaceId)
   const { currentUser, logout } = useAuth()
-  const { tasks, isLoading, errorMessage, addTask, saveTask, moveTask, removeTask, addSubtask, saveSubtask, removeSubtask, addTaskComment, addSubtaskComment, saveComment, removeComment, refreshTasks } = useTasks(parsedSpaceId)
+  const { tasks, isLoading, errorMessage, addTaskWithSubtasks, saveTaskWithSubtasks, moveTask, removeTask, refreshTasks } = useTasks(parsedSpaceId)
   const [space, setSpace] = useState<Space | null>(null)
+  const [regularUsers, setRegularUsers] = useState<RegularUserLookup[]>([])
   const [pageError, setPageError] = useState<string | null>(null)
-  const [createForm, setCreateForm] = useState<CreateTaskRequest>({ title: '', description: '', priority: 'Medium' })
+  const [modalState, setModalState] = useState<ModalState | null>(null)
 
   useEffect(() => {
     let isCancelled = false
@@ -45,19 +50,40 @@ export function SpaceBoardPage() {
     }
   }, [parsedSpaceId])
 
-  async function handleCreateTask(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+  useEffect(() => {
+    let isCancelled = false
 
-    try {
-      await addTask({
-        title: createForm.title.trim(),
-        description: createForm.description?.trim() || null,
-        priority: createForm.priority,
-      })
-      setCreateForm({ title: '', description: '', priority: 'Medium' })
-    } catch {
+    async function loadUsers() {
+      try {
+        const users = await getRegularUsers()
+        if (!isCancelled) {
+          setRegularUsers(users)
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          setPageError(error instanceof Error ? error.message : 'Unable to load assignees.')
+        }
+      }
+    }
+
+    if (currentUser?.role === 'Regular') {
+      void loadUsers()
+    }
+
+    return () => {
+      isCancelled = true
+    }
+  }, [currentUser?.role])
+
+  async function handleModalSave(taskRequest: CreateTaskRequest | UpdateTaskRequest, subtasks: SubtaskDraftSave[]) {
+    if (modalState?.mode === 'edit') {
+      await saveTaskWithSubtasks(modalState.task.id, taskRequest as UpdateTaskRequest, subtasks)
+      setModalState(null)
       return
     }
+
+    await addTaskWithSubtasks(taskRequest as CreateTaskRequest, subtasks)
+    setModalState(null)
   }
 
   async function handleSignOut() {
@@ -70,7 +96,7 @@ export function SpaceBoardPage() {
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[96rem] px-4 py-6 sm:px-6 lg:px-8">
+    <main className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-8 2xl:px-10">
       <section className="rounded-[2rem] border border-stride-border bg-stride-surface/95 p-6 shadow-board sm:p-8">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
@@ -87,42 +113,14 @@ export function SpaceBoardPage() {
             <button className="rounded-xl border border-stride-border bg-white px-4 py-2 text-sm font-semibold text-stride-ink" onClick={() => void refreshTasks()} type="button">
               Refresh board
             </button>
+            <button className="rounded-xl bg-stride-accent px-4 py-2 text-sm font-semibold text-white" onClick={() => setModalState({ mode: 'create', task: null })} type="button">
+              Create Task
+            </button>
             <button className="rounded-xl border border-stride-border bg-white px-4 py-2 text-sm font-semibold text-stride-ink" onClick={() => void handleSignOut()} type="button">
               Sign out {currentUser?.username ? `(${currentUser.username})` : ''}
             </button>
           </div>
         </div>
-        <form className="mt-8 grid gap-3 rounded-[1.5rem] border border-stride-border bg-white/80 p-5 lg:grid-cols-[1.2fr_1fr_auto]" onSubmit={handleCreateTask}>
-          <div className="grid gap-3 lg:col-span-2 lg:grid-cols-[1.2fr_1fr]">
-            <input
-              className="rounded-xl border border-stride-border bg-white px-4 py-3"
-              placeholder="Task title"
-              required
-              value={createForm.title}
-              onChange={(event) => setCreateForm((current) => ({ ...current, title: event.target.value }))}
-            />
-            <select
-              className="rounded-xl border border-stride-border bg-white px-4 py-3"
-              value={createForm.priority}
-              onChange={(event) => setCreateForm((current) => ({ ...current, priority: event.target.value as TaskPriority }))}
-            >
-              {priorities.map((priority) => (
-                <option key={priority} value={priority}>
-                  {priority}
-                </option>
-              ))}
-            </select>
-            <textarea
-              className="min-h-24 rounded-xl border border-stride-border bg-white px-4 py-3 lg:col-span-2"
-              placeholder="Optional description"
-              value={createForm.description ?? ''}
-              onChange={(event) => setCreateForm((current) => ({ ...current, description: event.target.value }))}
-            />
-          </div>
-          <button className="rounded-xl bg-stride-accent px-5 py-3 text-sm font-semibold text-white" type="submit">
-            Create task
-          </button>
-        </form>
         {pageError !== null || errorMessage !== null ? (
           <p className="mt-6 rounded-xl border border-stride-danger/30 bg-white px-4 py-3 text-sm text-stride-danger">
             {pageError ?? errorMessage}
@@ -137,19 +135,23 @@ export function SpaceBoardPage() {
         <div className="mt-8">
           <Board
             tasks={tasks}
-            currentUserId={currentUser?.id}
             onStatusChange={moveTask}
-            onUpdateTask={saveTask}
             onDeleteTask={removeTask}
-            onAddSubtask={addSubtask}
-            onUpdateSubtask={saveSubtask}
-            onDeleteSubtask={removeSubtask}
-            onAddTaskComment={addTaskComment}
-            onAddSubtaskComment={addSubtaskComment}
-            onUpdateComment={saveComment}
-            onDeleteComment={removeComment}
+            onSelectTask={(task) => setModalState({ mode: 'edit', task })}
           />
         </div>
+        {modalState !== null && space !== null && currentUser !== null ? (
+          <TaskModal
+            mode={modalState.mode}
+            task={modalState.task}
+            space={space}
+            currentUser={{ id: currentUser.id, username: currentUser.username }}
+            regularUsers={regularUsers}
+            errorMessage={errorMessage}
+            onDismiss={() => setModalState(null)}
+            onSave={handleModalSave}
+          />
+        ) : null}
       </section>
     </main>
   )

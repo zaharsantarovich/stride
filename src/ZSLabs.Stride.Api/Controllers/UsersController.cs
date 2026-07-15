@@ -7,7 +7,6 @@ using UserContract = ZSLabs.Stride.Api.Contracts.User;
 namespace ZSLabs.Stride.Api.Controllers;
 
 [ApiController]
-[Authorize(Policy = "AdminOnly")]
 [Route("users")]
 public sealed class UsersController : ControllerBase
 {
@@ -19,6 +18,7 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType<List<UserContract>>(StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<UserContract>>> GetAsync(CancellationToken cancellationToken)
     {
@@ -26,7 +26,17 @@ public sealed class UsersController : ControllerBase
         return Ok(users.Select(Map).ToList());
     }
 
+    [HttpGet("/regular-users")]
+    [Authorize(Policy = "RegularOnly")]
+    [ProducesResponseType<List<RegularUserLookup>>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IReadOnlyList<RegularUserLookup>>> GetRegularUsersAsync(CancellationToken cancellationToken)
+    {
+        var users = await _userService.GetRegularUsersAsync(cancellationToken);
+        return Ok(users.Select(user => new RegularUserLookup(user.Id, user.Username)).ToList());
+    }
+
     [HttpPost]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType<UserContract>(StatusCodes.Status201Created)]
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<UserContract>> CreateAsync([FromBody] CreateUserRequest request, CancellationToken cancellationToken)
@@ -43,6 +53,7 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType<UserContract>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status409Conflict)]

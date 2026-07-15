@@ -129,6 +129,9 @@ public class TaskService : ITaskService
     private IQueryable<TaskEntity> QueryTasks()
     {
         return _dbContext.Tasks
+            .Include(task => task.Assignee)
+            .Include(task => task.Subtasks.OrderBy(subtask => subtask.CreatedAt))
+            .ThenInclude(subtask => subtask.Assignee)
             .Include(task => task.Subtasks.OrderBy(subtask => subtask.CreatedAt))
             .ThenInclude(subtask => subtask.Comments.OrderBy(comment => comment.CreatedAt))
             .Include(task => task.Comments.OrderBy(comment => comment.CreatedAt));

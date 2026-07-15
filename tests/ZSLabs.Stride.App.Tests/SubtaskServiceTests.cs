@@ -72,6 +72,100 @@ public class SubtaskServiceTests
     }
 
     [Fact]
+    public async global::System.Threading.Tasks.Task CreateSubtaskAllowsNullAssignee()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", cancellationToken);
+        var task = await AddTaskAsync(context, owner.Id, false, cancellationToken);
+        var service = new SubtaskService(context);
+
+        var subtask = await service.CreateSubtaskAsync(task.Id, owner.Id, "Subtask", null, null, null, null, cancellationToken);
+
+        Assert.Null(subtask.AssigneeId);
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task CreateSubtaskAllowsPrivateSpaceCurrentUserAssignee()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", cancellationToken);
+        var task = await AddTaskAsync(context, owner.Id, false, cancellationToken);
+        var service = new SubtaskService(context);
+
+        var subtask = await service.CreateSubtaskAsync(task.Id, owner.Id, "Subtask", null, null, owner.Id, null, cancellationToken);
+
+        Assert.Equal(owner.Id, subtask.AssigneeId);
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task CreateSubtaskAllowsPublicSpaceRegularUserAssignee()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", cancellationToken);
+        var other = await AddUserAsync(context, "other", cancellationToken);
+        var task = await AddTaskAsync(context, owner.Id, true, cancellationToken);
+        var service = new SubtaskService(context);
+
+        var subtask = await service.CreateSubtaskAsync(task.Id, owner.Id, "Subtask", null, null, other.Id, null, cancellationToken);
+
+        Assert.Equal(other.Id, subtask.AssigneeId);
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task CreateSubtaskRejectsAdminAssignee()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", cancellationToken);
+        var admin = await AddUserAsync(context, "admin", cancellationToken, UserRole.Admin);
+        var task = await AddTaskAsync(context, owner.Id, true, cancellationToken);
+        var service = new SubtaskService(context);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.CreateSubtaskAsync(task.Id, owner.Id, "Subtask", null, null, admin.Id, null, cancellationToken));
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task UpdateSubtaskRejectsAdminAssignee()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", cancellationToken);
+        var admin = await AddUserAsync(context, "admin", cancellationToken, UserRole.Admin);
+        var task = await AddTaskAsync(context, owner.Id, true, cancellationToken);
+        var subtask = new Subtask(task.Id, "Subtask", null, SubtaskStatus.Todo, owner.Id, null, null, DateTime.UtcNow);
+        context.Subtasks.Add(subtask);
+        await context.SaveChangesAsync(cancellationToken);
+        var service = new SubtaskService(context);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.UpdateSubtaskAsync(subtask.Id, owner.Id, null, null, null, admin.Id, null, cancellationToken));
+    }
+
+    [Fact]
     public async global::System.Threading.Tasks.Task DeleteSubtaskCascadesComments()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
@@ -95,9 +189,13 @@ public class SubtaskServiceTests
         Assert.Equal(0, await context.Comments.CountAsync(cancellationToken));
     }
 
-    private static async Task<User> AddUserAsync(StrideDbContext context, string username, CancellationToken cancellationToken)
+    private static async Task<User> AddUserAsync(
+        StrideDbContext context,
+        string username,
+        CancellationToken cancellationToken,
+        UserRole role = UserRole.Regular)
     {
-        var user = new User(username, username + "-hash", null, UserRole.Regular, DateTime.UtcNow);
+        var user = new User(username, username + "-hash", null, role, DateTime.UtcNow);
         context.Users.Add(user);
         await context.SaveChangesAsync(cancellationToken);
         return user;

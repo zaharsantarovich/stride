@@ -96,6 +96,7 @@ public class SubtaskService : ISubtaskService
     private IQueryable<Subtask> QuerySubtasks()
     {
         return _dbContext.Subtasks
+            .Include(subtask => subtask.Assignee)
             .Include(subtask => subtask.Comments.OrderBy(comment => comment.CreatedAt));
     }
 

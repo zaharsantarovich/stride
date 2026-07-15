@@ -9,6 +9,7 @@ public sealed record Task(
     TaskPriority Priority,
     int AuthorId,
     int? AssigneeId,
+    string? AssigneeUsername,
     DateTime? DueDate,
     DateTime CreatedAt,
     DateTime? UpdatedAt,

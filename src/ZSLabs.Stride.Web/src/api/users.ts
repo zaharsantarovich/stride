@@ -1,8 +1,12 @@
 import { apiRequest } from './client'
-import type { CreateUserRequest, UpdateUserRequest, User } from './contracts'
+import type { CreateUserRequest, RegularUserLookup, UpdateUserRequest, User } from './contracts'
 
 export function getUsers() {
   return apiRequest<User[]>('/users')
+}
+
+export function getRegularUsers() {
+  return apiRequest<RegularUserLookup[]>('/regular-users')
 }
 
 export function createUser(request: CreateUserRequest) {

@@ -112,6 +112,7 @@ public sealed class SubtasksController : ControllerBase
             (Contracts.SubtaskStatus)subtask.Status,
             subtask.AuthorId,
             subtask.AssigneeId,
+            subtask.Assignee?.Username,
             subtask.DueDate,
             subtask.CreatedAt,
             subtask.UpdatedAt,

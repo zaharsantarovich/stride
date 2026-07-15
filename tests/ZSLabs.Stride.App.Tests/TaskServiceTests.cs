@@ -97,6 +97,100 @@ public class TaskServiceTests
     }
 
     [Fact]
+    public async global::System.Threading.Tasks.Task CreateTaskAllowsNullAssignee()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", UserRole.Regular, cancellationToken);
+        var space = await AddSpaceAsync(context, owner.Id, false, cancellationToken);
+        var service = new TaskService(context);
+
+        var task = await service.CreateTaskAsync(space.Id, owner.Id, "Secret", null, null, TaskPriority.Low, null, null, cancellationToken);
+
+        Assert.Null(task.AssigneeId);
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task CreateTaskAllowsPrivateSpaceCurrentUserAssignee()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", UserRole.Regular, cancellationToken);
+        var space = await AddSpaceAsync(context, owner.Id, false, cancellationToken);
+        var service = new TaskService(context);
+
+        var task = await service.CreateTaskAsync(space.Id, owner.Id, "Secret", null, null, TaskPriority.Low, owner.Id, null, cancellationToken);
+
+        Assert.Equal(owner.Id, task.AssigneeId);
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task CreateTaskAllowsPublicSpaceRegularUserAssignee()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", UserRole.Regular, cancellationToken);
+        var otherRegular = await AddUserAsync(context, "other", UserRole.Regular, cancellationToken);
+        var space = await AddSpaceAsync(context, owner.Id, true, cancellationToken);
+        var service = new TaskService(context);
+
+        var task = await service.CreateTaskAsync(space.Id, owner.Id, "Shared", null, null, TaskPriority.Low, otherRegular.Id, null, cancellationToken);
+
+        Assert.Equal(otherRegular.Id, task.AssigneeId);
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task CreateTaskRejectsAdminAssignee()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", UserRole.Regular, cancellationToken);
+        var admin = await AddUserAsync(context, "admin", UserRole.Admin, cancellationToken);
+        var space = await AddSpaceAsync(context, owner.Id, true, cancellationToken);
+        var service = new TaskService(context);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.CreateTaskAsync(space.Id, owner.Id, "Shared", null, null, TaskPriority.Low, admin.Id, null, cancellationToken));
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task UpdateTaskRejectsAdminAssignee()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", UserRole.Regular, cancellationToken);
+        var admin = await AddUserAsync(context, "admin", UserRole.Admin, cancellationToken);
+        var space = await AddSpaceAsync(context, owner.Id, true, cancellationToken);
+        var task = new TaskEntity(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Low, owner.Id, null, null, DateTime.UtcNow);
+        context.Tasks.Add(task);
+        await context.SaveChangesAsync(cancellationToken);
+        var service = new TaskService(context);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.UpdateTaskAsync(task.Id, owner.Id, null, null, null, null, admin.Id, null, cancellationToken));
+    }
+
+    [Fact]
     public async global::System.Threading.Tasks.Task DeleteTaskCascadesSubtasksAndComments()
     {
         var cancellationToken = TestContext.Current.CancellationToken;

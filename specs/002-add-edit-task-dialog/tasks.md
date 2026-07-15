@@ -30,8 +30,8 @@ description: "Task list for Task Modal Editing implementation"
 
 **Purpose**: Prepare the feature branch and identify the existing implementation points before changing behavior
 
-- [ ] T001 Review the feature design documents in `specs/002-add-edit-task-dialog/plan.md`, `specs/002-add-edit-task-dialog/spec.md`, `specs/002-add-edit-task-dialog/data-model.md`, `specs/002-add-edit-task-dialog/contracts/openapi.yaml`, and `specs/002-add-edit-task-dialog/quickstart.md`
-- [ ] T002 Inspect existing task, subtask, user, and board implementation points in `src/ZSLabs.Stride.App/Services/TaskService.cs`, `src/ZSLabs.Stride.App/Services/SubtaskService.cs`, `src/ZSLabs.Stride.App/Services/UserService.cs`, `src/ZSLabs.Stride.Api/Controllers/TasksController.cs`, `src/ZSLabs.Stride.Api/Controllers/SubtasksController.cs`, `src/ZSLabs.Stride.Api/Controllers/UsersController.cs`, `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`, `src/ZSLabs.Stride.Web/src/components/Board.tsx`, `src/ZSLabs.Stride.Web/src/components/TaskCard.tsx`, `src/ZSLabs.Stride.Web/src/components/SubtaskList.tsx`, and `src/ZSLabs.Stride.Web/src/hooks/useTasks.ts`
+- [x] T001 Review the feature design documents in `specs/002-add-edit-task-dialog/plan.md`, `specs/002-add-edit-task-dialog/spec.md`, `specs/002-add-edit-task-dialog/data-model.md`, `specs/002-add-edit-task-dialog/contracts/openapi.yaml`, and `specs/002-add-edit-task-dialog/quickstart.md`
+- [x] T002 Inspect existing task, subtask, user, and board implementation points in `src/ZSLabs.Stride.App/Services/TaskService.cs`, `src/ZSLabs.Stride.App/Services/SubtaskService.cs`, `src/ZSLabs.Stride.App/Services/UserService.cs`, `src/ZSLabs.Stride.Api/Controllers/TasksController.cs`, `src/ZSLabs.Stride.Api/Controllers/SubtasksController.cs`, `src/ZSLabs.Stride.Api/Controllers/UsersController.cs`, `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`, `src/ZSLabs.Stride.Web/src/components/Board.tsx`, `src/ZSLabs.Stride.Web/src/components/TaskCard.tsx`, `src/ZSLabs.Stride.Web/src/components/SubtaskList.tsx`, and `src/ZSLabs.Stride.Web/src/hooks/useTasks.ts`
 
 ---
 
@@ -41,17 +41,17 @@ description: "Task list for Task Modal Editing implementation"
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Add `RegularUserLookup` response contract in `src/ZSLabs.Stride.Api/Contracts/RegularUserLookup.cs`
-- [ ] T004 Extend `IUserService` and `UserService` with regular-user lookup ordered by username in `src/ZSLabs.Stride.App/Services/IUserService.cs` and `src/ZSLabs.Stride.App/Services/UserService.cs`
-- [ ] T005 Add `UserService` unit tests for regular-user lookup excluding admin users and ordering by username in `tests/ZSLabs.Stride.App.Tests/UserServiceTests.cs`
-- [ ] T006 Add regular-user lookup action `GET /regular-users` for authenticated regular users in `src/ZSLabs.Stride.Api/Controllers/UsersController.cs`
-- [ ] T007 Add `UsersController` unit tests for `GET /regular-users` success, authenticated access, and admin exclusion behavior in `tests/ZSLabs.Stride.Api.Tests/UsersControllerTests.cs`
-- [ ] T008 Add backend assignee eligibility validation for task create/update in `src/ZSLabs.Stride.App/Services/TaskService.cs`
-- [ ] T009 Add backend assignee eligibility validation for subtask create/update in `src/ZSLabs.Stride.App/Services/SubtaskService.cs`
-- [ ] T010 Add task assignee eligibility unit tests covering null assignee, private-space current user, private-space other regular user rejection, public-space regular user, and admin rejection in `tests/ZSLabs.Stride.App.Tests/TaskServiceTests.cs`
-- [ ] T011 Add subtask assignee eligibility unit tests covering null assignee, private-space current user, private-space other regular user rejection, public-space regular user, and admin rejection in `tests/ZSLabs.Stride.App.Tests/SubtaskServiceTests.cs`
-- [ ] T012 Ensure task and subtask API save failures return modal-displayable error responses for ineligible assignees in `src/ZSLabs.Stride.Api/Controllers/TasksController.cs`, `src/ZSLabs.Stride.Api/Controllers/SubtasksController.cs`, and `src/ZSLabs.Stride.Api/Contracts/ErrorResponse.cs`
-- [ ] T013 Add typed frontend regular-user lookup and assignee-related task/subtask contract fields in `src/ZSLabs.Stride.Web/src/api/users.ts`, `src/ZSLabs.Stride.Web/src/api/tasks.ts`, and `src/ZSLabs.Stride.Web/src/api/contracts.ts`
+- [x] T003 Add `RegularUserLookup` response contract in `src/ZSLabs.Stride.Api/Contracts/RegularUserLookup.cs`
+- [x] T004 Extend `IUserService` and `UserService` with regular-user lookup ordered by username in `src/ZSLabs.Stride.App/Services/IUserService.cs` and `src/ZSLabs.Stride.App/Services/UserService.cs`
+- [x] T005 Add `UserService` unit tests for regular-user lookup excluding admin users and ordering by username in `tests/ZSLabs.Stride.App.Tests/UserServiceTests.cs`
+- [x] T006 Add regular-user lookup action `GET /regular-users` for authenticated regular users in `src/ZSLabs.Stride.Api/Controllers/UsersController.cs`
+- [x] T007 Add `UsersController` unit tests for `GET /regular-users` success, authenticated access, and admin exclusion behavior in `tests/ZSLabs.Stride.Api.Tests/UsersControllerTests.cs`
+- [x] T008 Add backend assignee eligibility validation for task create/update in `src/ZSLabs.Stride.App/Services/TaskService.cs`
+- [x] T009 Add backend assignee eligibility validation for subtask create/update in `src/ZSLabs.Stride.App/Services/SubtaskService.cs`
+- [x] T010 Add task assignee eligibility unit tests covering null assignee, private-space current user, private-space other regular user rejection, public-space regular user, and admin rejection in `tests/ZSLabs.Stride.App.Tests/TaskServiceTests.cs`
+- [x] T011 Add subtask assignee eligibility unit tests covering null assignee, private-space current user, private-space other regular user rejection, public-space regular user, and admin rejection in `tests/ZSLabs.Stride.App.Tests/SubtaskServiceTests.cs`
+- [x] T012 Ensure task and subtask API save failures return modal-displayable error responses for ineligible assignees in `src/ZSLabs.Stride.Api/Controllers/TasksController.cs`, `src/ZSLabs.Stride.Api/Controllers/SubtasksController.cs`, and `src/ZSLabs.Stride.Api/Contracts/ErrorResponse.cs`
+- [x] T013 Add typed frontend regular-user lookup and assignee-related task/subtask contract fields in `src/ZSLabs.Stride.Web/src/api/users.ts`, `src/ZSLabs.Stride.Web/src/api/tasks.ts`, and `src/ZSLabs.Stride.Web/src/api/contracts.ts`
 
 **Checkpoint**: Backend eligibility, lookup contracts, and typed frontend API support are ready for modal UI work
 
@@ -65,11 +65,11 @@ description: "Task list for Task Modal Editing implementation"
 
 ### Implementation and Tests for User Story 1
 
-- [ ] T014 [US1] Create shared task modal component with edit-mode draft state, save failure display, discard-on-dismiss behavior, and desktop/mobile layout classes in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`
-- [ ] T015 [US1] Move editable subtask management from board-facing controls into modal draft rows in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx` and remove edit responsibilities from `src/ZSLabs.Stride.Web/src/components/SubtaskList.tsx`
-- [ ] T016 [US1] Update task state orchestration to save edited task fields and modal-managed subtasks without leaking unsaved draft state to the board in `src/ZSLabs.Stride.Web/src/hooks/useTasks.ts`
-- [ ] T017 [US1] Open the modal when a user selects an existing task card and close it after successful save or dismiss in `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`
-- [ ] T018 [US1] Convert board task and subtask display to read-only interaction while preserving task-card selection and drag behavior in `src/ZSLabs.Stride.Web/src/components/Board.tsx`, `src/ZSLabs.Stride.Web/src/components/Column.tsx`, `src/ZSLabs.Stride.Web/src/components/TaskCard.tsx`, and `src/ZSLabs.Stride.Web/src/components/SubtaskList.tsx`
+- [x] T014 [US1] Create shared task modal component with edit-mode draft state, save failure display, discard-on-dismiss behavior, and desktop/mobile layout classes in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`
+- [x] T015 [US1] Move editable subtask management from board-facing controls into modal draft rows in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx` and remove edit responsibilities from `src/ZSLabs.Stride.Web/src/components/SubtaskList.tsx`
+- [x] T016 [US1] Update task state orchestration to save edited task fields and modal-managed subtasks without leaking unsaved draft state to the board in `src/ZSLabs.Stride.Web/src/hooks/useTasks.ts`
+- [x] T017 [US1] Open the modal when a user selects an existing task card and close it after successful save or dismiss in `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`
+- [x] T018 [US1] Convert board task and subtask display to read-only interaction while preserving task-card selection and drag behavior in `src/ZSLabs.Stride.Web/src/components/Board.tsx`, `src/ZSLabs.Stride.Web/src/components/Column.tsx`, `src/ZSLabs.Stride.Web/src/components/TaskCard.tsx`, and `src/ZSLabs.Stride.Web/src/components/SubtaskList.tsx`
 
 **Checkpoint**: User Story 1 is fully functional and independently testable
 
@@ -83,9 +83,9 @@ description: "Task list for Task Modal Editing implementation"
 
 ### Implementation and Tests for User Story 2
 
-- [ ] T019 [US2] Add create-mode defaults, labels, and submit handling to the shared modal in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`
-- [ ] T020 [US2] Replace the top-of-board inline task creation form with a Create Task button that opens the modal in `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`
-- [ ] T021 [US2] Wire create-task API submission and board refresh/update behavior through `src/ZSLabs.Stride.Web/src/hooks/useTasks.ts` and `src/ZSLabs.Stride.Web/src/api/tasks.ts`
+- [x] T019 [US2] Add create-mode defaults, labels, and submit handling to the shared modal in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`
+- [x] T020 [US2] Replace the top-of-board inline task creation form with a Create Task button that opens the modal in `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`
+- [x] T021 [US2] Wire create-task API submission and board refresh/update behavior through `src/ZSLabs.Stride.Web/src/hooks/useTasks.ts` and `src/ZSLabs.Stride.Web/src/api/tasks.ts`
 
 **Checkpoint**: User Stories 1 and 2 both work through the shared modal
 
@@ -99,10 +99,10 @@ description: "Task list for Task Modal Editing implementation"
 
 ### Implementation and Tests for User Story 3
 
-- [ ] T022 [US3] Ensure task list responses expose assignee username and subtask titles needed by the board summary in `src/ZSLabs.Stride.Api/Contracts/Task.cs`, `src/ZSLabs.Stride.Api/Contracts/Subtask.cs`, and `src/ZSLabs.Stride.Api/Controllers/TasksController.cs`
-- [ ] T023 [US3] Update frontend task contract types to include assignee username and subtask title summary data in `src/ZSLabs.Stride.Web/src/api/contracts.ts`
-- [ ] T024 [US3] Render title, priority, assigned username or clear unassigned state, and all subtask titles as compact read-only card content in `src/ZSLabs.Stride.Web/src/components/TaskCard.tsx`
-- [ ] T025 [US3] Preserve board/column scrolling for cards with many subtasks without adding inline controls in `src/ZSLabs.Stride.Web/src/components/Board.tsx`, `src/ZSLabs.Stride.Web/src/components/Column.tsx`, and `src/ZSLabs.Stride.Web/src/components/TaskCard.tsx`
+- [x] T022 [US3] Ensure task list responses expose assignee username and subtask titles needed by the board summary in `src/ZSLabs.Stride.Api/Contracts/Task.cs`, `src/ZSLabs.Stride.Api/Contracts/Subtask.cs`, and `src/ZSLabs.Stride.Api/Controllers/TasksController.cs`
+- [x] T023 [US3] Update frontend task contract types to include assignee username and subtask title summary data in `src/ZSLabs.Stride.Web/src/api/contracts.ts`
+- [x] T024 [US3] Render title, priority, assigned username or clear unassigned state, and all subtask titles as compact read-only card content in `src/ZSLabs.Stride.Web/src/components/TaskCard.tsx`
+- [x] T025 [US3] Preserve board/column scrolling for cards with many subtasks without adding inline controls in `src/ZSLabs.Stride.Web/src/components/Board.tsx`, `src/ZSLabs.Stride.Web/src/components/Column.tsx`, and `src/ZSLabs.Stride.Web/src/components/TaskCard.tsx`
 
 **Checkpoint**: User Story 3 board summaries are readable and independently testable
 
@@ -116,8 +116,8 @@ description: "Task list for Task Modal Editing implementation"
 
 ### Implementation and Tests for User Story 4
 
-- [ ] T026 [US4] Apply responsive modal sizing, centering, max 90vw, max 90vh, max width 960px, and scroll containment in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`
-- [ ] T027 [US4] Ensure modal controls remain touch-usable and light-theme-token based across mobile and desktop widths in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx` and `src/ZSLabs.Stride.Web/src/styles/index.css`
+- [x] T026 [US4] Apply responsive modal sizing, centering, max 90vw, max 90vh, max width 960px, and scroll containment in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`
+- [x] T027 [US4] Ensure modal controls remain touch-usable and light-theme-token based across mobile and desktop widths in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx` and `src/ZSLabs.Stride.Web/src/styles/index.css`
 
 **Checkpoint**: User Story 4 responsive modal behavior is independently testable
 
@@ -127,14 +127,14 @@ description: "Task list for Task Modal Editing implementation"
 
 **Purpose**: Validate the complete feature, remove unused implementation leftovers, and run required browser checks
 
-- [ ] T028 Run all .NET tests and confirm aggregate unit-test line coverage remains >= 80% using `coverage.runsettings`
-- [ ] T029 Run frontend lint and production build validation in `src/ZSLabs.Stride.Web/package.json`
-- [ ] T030 Remove unused inline-editing code, unused using statements, unused frontend imports, unused NuGet packages, unused frontend dependencies, unused resources, and dead files from `src/ZSLabs.Stride.Web`, `src/ZSLabs.Stride.Api`, `src/ZSLabs.Stride.App`, `src/ZSLabs.Stride.Domain`, and `src/ZSLabs.Stride.Persistence`
-- [ ] T031 Start the API and frontend using the local development flow documented in `specs/002-add-edit-task-dialog/quickstart.md`
-- [ ] T032 In the VS Code built-in browser at `https://localhost:5173`, log in as regular user username `a` and password `a`, then verify editing an existing task through the modal updates the board summary while board task and subtask content remains read-only using `specs/002-add-edit-task-dialog/quickstart.md`
-- [ ] T033 In the VS Code built-in browser at `https://localhost:5173`, logged in as username `a` and password `a`, verify Create Task opens the shared modal, saves a new task, shows it on the board, and confirms the old top-of-board create form is absent using `specs/002-add-edit-task-dialog/quickstart.md`
-- [ ] T034 In the VS Code built-in browser at `https://localhost:5173`, logged in as username `a` and password `a`, verify public-space and private-space assignee selector behavior plus modal save failure preservation using `specs/002-add-edit-task-dialog/quickstart.md`
-- [ ] T035 In the VS Code built-in browser at `https://localhost:5173`, logged in as username `a` and password `a`, verify modal layout below 768px and at desktop width including vertical scrolling with many subtasks using `specs/002-add-edit-task-dialog/quickstart.md`
+- [x] T028 Run all .NET tests and confirm aggregate unit-test line coverage remains >= 80% using `coverage.runsettings`
+- [x] T029 Run frontend lint and production build validation in `src/ZSLabs.Stride.Web/package.json`
+- [x] T030 Remove unused inline-editing code, unused using statements, unused frontend imports, unused NuGet packages, unused frontend dependencies, unused resources, and dead files from `src/ZSLabs.Stride.Web`, `src/ZSLabs.Stride.Api`, `src/ZSLabs.Stride.App`, `src/ZSLabs.Stride.Domain`, and `src/ZSLabs.Stride.Persistence`
+- [x] T031 Start the API and frontend using the local development flow documented in `specs/002-add-edit-task-dialog/quickstart.md`
+- [x] T032 In the VS Code built-in browser at `https://localhost:5173`, log in as regular user username `a` and password `a`, then verify editing an existing task through the modal updates the board summary while board task and subtask content remains read-only using `specs/002-add-edit-task-dialog/quickstart.md`
+- [x] T033 In the VS Code built-in browser at `https://localhost:5173`, logged in as username `a` and password `a`, verify Create Task opens the shared modal, saves a new task, shows it on the board, and confirms the old top-of-board create form is absent using `specs/002-add-edit-task-dialog/quickstart.md`
+- [x] T034 In the VS Code built-in browser at `https://localhost:5173`, logged in as username `a` and password `a`, verify public-space and private-space assignee selector behavior plus modal save failure preservation using `specs/002-add-edit-task-dialog/quickstart.md`
+- [x] T035 In the VS Code built-in browser at `https://localhost:5173`, logged in as username `a` and password `a`, verify modal layout below 768px and at desktop width including vertical scrolling with many subtasks using `specs/002-add-edit-task-dialog/quickstart.md`
 
 ---
 

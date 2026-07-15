@@ -1,37 +1,21 @@
 import { useDroppable } from '@dnd-kit/core'
-import type { CreateSubtaskRequest, Task, TaskStatus, UpdateSubtaskRequest, UpdateTaskRequest } from '../api/contracts'
+import type { Task, TaskStatus } from '../api/contracts'
 import { TaskCard } from './TaskCard'
 
 interface ColumnProps {
   status: TaskStatus
   title: string
   tasks: Task[]
-  currentUserId?: number
-  onUpdateTask: (taskId: number, request: UpdateTaskRequest) => Promise<unknown>
   onDeleteTask: (taskId: number) => Promise<void>
-  onAddSubtask: (taskId: number, request: CreateSubtaskRequest) => Promise<void>
-  onUpdateSubtask: (subtaskId: number, request: UpdateSubtaskRequest) => Promise<void>
-  onDeleteSubtask: (subtaskId: number) => Promise<void>
-  onAddTaskComment: (taskId: number, content: string) => Promise<void>
-  onAddSubtaskComment: (subtaskId: number, content: string) => Promise<void>
-  onUpdateComment: (commentId: number, content: string) => Promise<void>
-  onDeleteComment: (commentId: number) => Promise<void>
+  onSelectTask: (task: Task) => void
 }
 
 export function Column({
   status,
   title,
   tasks,
-  currentUserId,
-  onUpdateTask,
   onDeleteTask,
-  onAddSubtask,
-  onUpdateSubtask,
-  onDeleteSubtask,
-  onAddTaskComment,
-  onAddSubtaskComment,
-  onUpdateComment,
-  onDeleteComment,
+  onSelectTask,
 }: ColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: `column-${status}`,
@@ -41,7 +25,7 @@ export function Column({
   return (
     <section
       ref={setNodeRef}
-      className={`min-h-[24rem] min-w-[18rem] rounded-[1.75rem] border p-4 ${
+      className={`min-h-[24rem] min-w-[14rem] flex-1 basis-0 rounded-[1.75rem] border p-4 ${
         isOver ? 'border-stride-accent bg-white/95' : 'border-stride-border bg-stride-surface/90'
       }`}
     >
@@ -54,19 +38,11 @@ export function Column({
           <TaskCard
             key={task.id}
             task={task}
-            currentUserId={currentUserId}
-            onUpdate={onUpdateTask}
             onDelete={onDeleteTask}
-            onAddSubtask={onAddSubtask}
-            onUpdateSubtask={onUpdateSubtask}
-            onDeleteSubtask={onDeleteSubtask}
-            onAddTaskComment={onAddTaskComment}
-            onAddSubtaskComment={onAddSubtaskComment}
-            onUpdateComment={onUpdateComment}
-            onDeleteComment={onDeleteComment}
+            onSelect={onSelectTask}
           />
         ))}
-        {tasks.length === 0 ? <p className="rounded-2xl border border-dashed border-stride-border px-4 py-8 text-sm text-stride-muted">Drop a task here or create one above.</p> : null}
+        {tasks.length === 0 ? <p className="rounded-2xl border border-dashed border-stride-border px-4 py-8 text-sm text-stride-muted">Drop a task here or create one from the board header.</p> : null}
       </div>
     </section>
   )

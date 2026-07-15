@@ -20,6 +20,11 @@ export interface User {
   createdAt: string
 }
 
+export interface RegularUserLookup {
+  id: number
+  username: string
+}
+
 export interface CreateUserRequest {
   username: string
   password: string
@@ -77,6 +82,7 @@ export interface Subtask {
   status: SubtaskStatus
   authorId: number
   assigneeId: number | null
+  assigneeUsername: string | null
   dueDate: string | null
   createdAt: string
   updatedAt?: string | null
@@ -92,6 +98,7 @@ export interface Task {
   priority: TaskPriority
   authorId: number
   assigneeId: number | null
+  assigneeUsername: string | null
   dueDate: string | null
   createdAt: string
   updatedAt?: string | null

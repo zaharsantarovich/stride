@@ -2,14 +2,10 @@ import { useEffect, useState } from 'react'
 import { ApiError } from '../api/client'
 import {
   createSubtask,
-  createSubtaskComment,
   createTask,
-  createTaskComment,
-  deleteComment,
   deleteSubtask,
   deleteTask,
   getTasks,
-  updateComment,
   updateSubtask,
   updateTask,
   updateTaskStatus,
@@ -17,6 +13,7 @@ import {
 import type {
   CreateSubtaskRequest,
   CreateTaskRequest,
+  SubtaskStatus,
   Task,
   TaskPriority,
   TaskStatus,
@@ -30,6 +27,16 @@ const priorityRank: Record<TaskPriority, number> = {
   High: 1,
   Medium: 2,
   Low: 3,
+}
+
+export interface SubtaskDraftSave {
+  id?: number
+  title: string
+  description: string | null
+  status: SubtaskStatus
+  assigneeId: number | null
+  dueDate: string | null
+  isDeleted?: boolean
 }
 
 function sortTasks(tasks: Task[]) {
@@ -92,10 +99,21 @@ export function useTasks(spaceId: number) {
     setErrorMessage(null)
   }
 
-  async function addTask(request: CreateTaskRequest) {
+  async function addTaskWithSubtasks(request: CreateTaskRequest, subtasks: SubtaskDraftSave[]) {
     try {
       const created = await createTask(spaceId, request)
-      setTasks((current) => sortTasks([...current, created]))
+
+      for (const subtask of subtasks.filter((candidate) => !candidate.isDeleted && candidate.title.trim().length > 0)) {
+        await createSubtask(created.id, {
+          title: subtask.title.trim(),
+          description: subtask.description?.trim() || null,
+          status: subtask.status,
+          assigneeId: subtask.assigneeId,
+          dueDate: subtask.dueDate,
+        })
+      }
+
+      await refreshTasks()
       setErrorMessage(null)
       return created
     } catch (error) {
@@ -105,10 +123,36 @@ export function useTasks(spaceId: number) {
     }
   }
 
-  async function saveTask(taskId: number, request: UpdateTaskRequest) {
+  async function saveTaskWithSubtasks(taskId: number, request: UpdateTaskRequest, subtasks: SubtaskDraftSave[]) {
     try {
       const updated = await updateTask(taskId, request)
-      setTasks((current) => sortTasks(current.map((task) => (task.id === updated.id ? updated : task))))
+
+      for (const subtask of subtasks) {
+        if (subtask.id !== undefined && subtask.isDeleted) {
+          await deleteSubtask(subtask.id)
+          continue
+        }
+
+        if (subtask.isDeleted || subtask.title.trim().length === 0) {
+          continue
+        }
+
+        const subtaskRequest = {
+          title: subtask.title.trim(),
+          description: subtask.description?.trim() || null,
+          status: subtask.status,
+          assigneeId: subtask.assigneeId,
+          dueDate: subtask.dueDate,
+        }
+
+        if (subtask.id === undefined) {
+          await createSubtask(taskId, subtaskRequest)
+        } else {
+          await updateSubtask(subtask.id, subtaskRequest)
+        }
+      }
+
+      await refreshTasks()
       setErrorMessage(null)
       return updated
     } catch (error) {
@@ -179,65 +223,17 @@ export function useTasks(spaceId: number) {
     }
   }
 
-  async function addTaskComment(taskId: number, content: string) {
-    try {
-      await createTaskComment(taskId, { content })
-      await refreshTasks()
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Unable to add comment.'
-      setErrorMessage(message)
-      throw error
-    }
-  }
-
-  async function addSubtaskComment(subtaskId: number, content: string) {
-    try {
-      await createSubtaskComment(subtaskId, { content })
-      await refreshTasks()
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Unable to add comment.'
-      setErrorMessage(message)
-      throw error
-    }
-  }
-
-  async function saveComment(commentId: number, content: string) {
-    try {
-      await updateComment(commentId, { content })
-      await refreshTasks()
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Unable to update comment.'
-      setErrorMessage(message)
-      throw error
-    }
-  }
-
-  async function removeComment(commentId: number) {
-    try {
-      await deleteComment(commentId)
-      await refreshTasks()
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Unable to delete comment.'
-      setErrorMessage(message)
-      throw error
-    }
-  }
-
   return {
     tasks,
     isLoading,
     errorMessage,
     refreshTasks,
-    addTask,
-    saveTask,
+    addTaskWithSubtasks,
+    saveTaskWithSubtasks,
     moveTask,
     removeTask,
     addSubtask,
     saveSubtask,
     removeSubtask,
-    addTaskComment,
-    addSubtaskComment,
-    saveComment,
-    removeComment,
   }
 }
