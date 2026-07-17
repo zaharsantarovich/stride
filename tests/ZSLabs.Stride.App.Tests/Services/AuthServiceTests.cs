@@ -5,7 +5,7 @@ using ZSLabs.Stride.Domain.Enums;
 using ZSLabs.Stride.Persistence;
 using User = ZSLabs.Stride.Domain.Entities.User;
 
-namespace ZSLabs.Stride.App.Tests;
+namespace ZSLabs.Stride.App.Tests.Services;
 
 public class AuthServiceTests
 {

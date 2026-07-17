@@ -5,7 +5,7 @@ using ZSLabs.Stride.Domain.Entities;
 using ZSLabs.Stride.Domain.Enums;
 using ZSLabs.Stride.Persistence;
 
-namespace ZSLabs.Stride.App.Tests;
+namespace ZSLabs.Stride.App.Tests.Services;
 
 public class UserServiceTests
 {

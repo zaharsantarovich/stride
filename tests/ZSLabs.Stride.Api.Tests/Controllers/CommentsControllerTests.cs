@@ -9,7 +9,7 @@ using ZSLabs.Stride.Api.Controllers;
 using ZSLabs.Stride.App.Services;
 using DomainComment = ZSLabs.Stride.Domain.Entities.Comment;
 
-namespace ZSLabs.Stride.Api.Tests;
+namespace ZSLabs.Stride.Api.Tests.Controllers;
 
 public class CommentsControllerTests
 {

@@ -2,7 +2,7 @@ using ZSLabs.Stride.App.Services;
 using ZSLabs.Stride.Domain.Entities;
 using ZSLabs.Stride.Domain.Enums;
 
-namespace ZSLabs.Stride.App.Tests;
+namespace ZSLabs.Stride.App.Tests.Services;
 
 public class PasswordHashingServiceTests
 {

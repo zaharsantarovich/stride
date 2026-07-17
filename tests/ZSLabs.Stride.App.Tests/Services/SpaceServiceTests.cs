@@ -8,7 +8,7 @@ using ZSLabs.Stride.App.Services;
 using ZSLabs.Stride.Domain.Entities;
 using ZSLabs.Stride.Persistence;
 
-namespace ZSLabs.Stride.App.Tests;
+namespace ZSLabs.Stride.App.Tests.Services;
 
 public class SpaceServiceTests
 {

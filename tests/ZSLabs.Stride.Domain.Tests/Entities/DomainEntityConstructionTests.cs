@@ -3,7 +3,7 @@ using TaskStatus = ZSLabs.Stride.Domain.Enums.TaskStatus;
 using UserRole = ZSLabs.Stride.Domain.Enums.UserRole;
 using ZSLabs.Stride.Domain.Entities;
 
-namespace ZSLabs.Stride.Domain.Tests;
+namespace ZSLabs.Stride.Domain.Tests.Entities;
 
 public class DomainEntityConstructionTests
 {

@@ -10,7 +10,7 @@ using ZSLabs.Stride.App.Services;
 using DomainSubtask = ZSLabs.Stride.Domain.Entities.Subtask;
 using DomainSubtaskStatus = ZSLabs.Stride.Domain.Enums.SubtaskStatus;
 
-namespace ZSLabs.Stride.Api.Tests;
+namespace ZSLabs.Stride.Api.Tests.Controllers;
 
 public class SubtasksControllerTests
 {

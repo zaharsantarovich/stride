@@ -10,7 +10,7 @@ using ZSLabs.Stride.App.Services;
 using ZSLabs.Stride.Domain.Entities;
 using DomainSpace = ZSLabs.Stride.Domain.Entities.Space;
 
-namespace ZSLabs.Stride.Api.Tests;
+namespace ZSLabs.Stride.Api.Tests.Controllers;
 
 public class SpacesControllerTests
 {

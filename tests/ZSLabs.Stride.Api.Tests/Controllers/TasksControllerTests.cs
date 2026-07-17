@@ -11,7 +11,7 @@ using DomainTask = ZSLabs.Stride.Domain.Entities.Task;
 using DomainTaskPriority = ZSLabs.Stride.Domain.Enums.TaskPriority;
 using DomainTaskStatus = ZSLabs.Stride.Domain.Enums.TaskStatus;
 
-namespace ZSLabs.Stride.Api.Tests;
+namespace ZSLabs.Stride.Api.Tests.Controllers;
 
 public class TasksControllerTests
 {

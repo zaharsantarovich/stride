@@ -8,7 +8,7 @@ using TaskEntity = ZSLabs.Stride.Domain.Entities.Task;
 using TaskPriority = ZSLabs.Stride.Domain.Enums.TaskPriority;
 using TaskStatus = ZSLabs.Stride.Domain.Enums.TaskStatus;
 
-namespace ZSLabs.Stride.App.Tests;
+namespace ZSLabs.Stride.App.Tests.Services;
 
 public class CommentServiceTests
 {

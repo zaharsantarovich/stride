@@ -10,7 +10,7 @@ using ZSLabs.Stride.Domain.Entities;
 using ZSLabs.Stride.Domain.Enums;
 using DomainUser = ZSLabs.Stride.Domain.Entities.User;
 
-namespace ZSLabs.Stride.Api.Tests;
+namespace ZSLabs.Stride.Api.Tests.Controllers;
 
 public class UsersControllerTests
 {
