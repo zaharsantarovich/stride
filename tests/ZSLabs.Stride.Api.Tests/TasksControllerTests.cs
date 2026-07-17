@@ -16,7 +16,7 @@ namespace ZSLabs.Stride.Api.Tests;
 public class TasksControllerTests
 {
     [Fact]
-    public void ControllerRequiresRegularOnlyPolicy()
+    public void TasksController_ClassAttribute_RequiresRegularOnlyPolicy()
     {
         var attribute = typeof(TasksController).GetCustomAttribute<AuthorizeAttribute>();
 
@@ -25,7 +25,7 @@ public class TasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetAsyncReturnsTasks()
+    public async global::System.Threading.Tasks.Task GetAsync_ValidSpaceAndUser_ReturnsTasks()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ITaskService>();
@@ -42,7 +42,7 @@ public class TasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateAsyncReturnsForbiddenForNoAccess()
+    public async global::System.Threading.Tasks.Task CreateAsync_NoSpaceAccess_ReturnsForbidden()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ITaskService>();
@@ -57,7 +57,7 @@ public class TasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateStatusAsyncReturnsUpdatedTask()
+    public async global::System.Threading.Tasks.Task UpdateStatusAsync_ValidStatus_ReturnsUpdatedTask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ITaskService>();
@@ -73,7 +73,7 @@ public class TasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteAsyncReturnsNoContent()
+    public async global::System.Threading.Tasks.Task DeleteAsync_ExistingTask_ReturnsNoContent()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ITaskService>();

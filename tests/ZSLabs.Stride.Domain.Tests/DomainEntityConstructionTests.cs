@@ -8,7 +8,7 @@ namespace ZSLabs.Stride.Domain.Tests;
 public class DomainEntityConstructionTests
 {
     [Fact]
-    public void TaskConstructorAssignsExpectedValues()
+    public void TaskConstructor_AllParameters_AssignsExpectedValues()
     {
         var createdAt = DateTime.UtcNow;
         var task = new ZSLabs.Stride.Domain.Entities.Task(
@@ -31,7 +31,7 @@ public class DomainEntityConstructionTests
     }
 
     [Fact]
-    public void UserConstructorAssignsExpectedValues()
+    public void UserConstructor_AllParameters_AssignsExpectedValues()
     {
         var createdAt = DateTime.UtcNow;
         var user = new User("admin", "hash", "admin@example.com", UserRole.Admin, createdAt);

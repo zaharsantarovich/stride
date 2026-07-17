@@ -13,7 +13,7 @@ namespace ZSLabs.Stride.App.Tests;
 public class SpaceServiceTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateSpaceRejectsDuplicateKey()
+    public async global::System.Threading.Tasks.Task CreateSpaceAsync_DuplicateKey_ThrowsInvalidOperationException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -30,7 +30,7 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetVisibleSpacesFiltersPrivateSpaces()
+    public async global::System.Threading.Tasks.Task GetVisibleSpacesAsync_PrivateAndPublicSpaces_FiltersInaccessiblePrivateSpaces()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -53,7 +53,7 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateSpaceAllowsOnlyAuthorToChangeVisibility()
+    public async global::System.Threading.Tasks.Task UpdateSpaceAsync_NonAuthorVisibilityChange_ThrowsUnauthorizedAccessException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -78,7 +78,7 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteSpaceCascadesTasksAndComments()
+    public async global::System.Threading.Tasks.Task DeleteSpaceAsync_SpaceWithTasksAndComments_CascadesDelete()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");

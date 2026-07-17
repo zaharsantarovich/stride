@@ -13,7 +13,7 @@ namespace ZSLabs.Stride.App.Tests;
 public class SubtaskServiceTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateSubtaskDefaultsToTodo()
+    public async global::System.Threading.Tasks.Task CreateSubtaskAsync_NoStatusProvided_DefaultsToTodo()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -31,7 +31,7 @@ public class SubtaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateSubtaskPersistsStatusChange()
+    public async global::System.Threading.Tasks.Task UpdateSubtaskAsync_NewStatus_PersistsChange()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -54,7 +54,7 @@ public class SubtaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateSubtaskRejectsAssigneeWithoutSpaceAccess()
+    public async global::System.Threading.Tasks.Task CreateSubtaskAsync_AssigneeWithoutSpaceAccess_ThrowsInvalidOperationException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -72,7 +72,7 @@ public class SubtaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateSubtaskAllowsNullAssignee()
+    public async global::System.Threading.Tasks.Task CreateSubtaskAsync_NullAssignee_CreatesSubtask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -90,7 +90,7 @@ public class SubtaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateSubtaskAllowsPrivateSpaceCurrentUserAssignee()
+    public async global::System.Threading.Tasks.Task CreateSubtaskAsync_PrivateSpaceOwnerAssignee_CreatesSubtask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -108,7 +108,7 @@ public class SubtaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateSubtaskAllowsPublicSpaceRegularUserAssignee()
+    public async global::System.Threading.Tasks.Task CreateSubtaskAsync_PublicSpaceRegularUserAssignee_CreatesSubtask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -127,7 +127,7 @@ public class SubtaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateSubtaskRejectsAdminAssignee()
+    public async global::System.Threading.Tasks.Task CreateSubtaskAsync_AdminAssignee_ThrowsInvalidOperationException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -145,7 +145,7 @@ public class SubtaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateSubtaskRejectsAdminAssignee()
+    public async global::System.Threading.Tasks.Task UpdateSubtaskAsync_AdminAssignee_ThrowsInvalidOperationException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -166,7 +166,7 @@ public class SubtaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteSubtaskCascadesComments()
+    public async global::System.Threading.Tasks.Task DeleteSubtaskAsync_SubtaskWithComments_CascadesDelete()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");

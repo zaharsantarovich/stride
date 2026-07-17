@@ -13,7 +13,7 @@ namespace ZSLabs.Stride.App.Tests;
 public class CommentServiceTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateCommentSupportsTaskAndSubtaskTargets()
+    public async global::System.Threading.Tasks.Task CommentCreation_TaskAndSubtaskTargets_CreatesComments()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -38,7 +38,7 @@ public class CommentServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateAndDeleteRequireCommentAuthor()
+    public async global::System.Threading.Tasks.Task CommentModification_NonAuthor_ThrowsUnauthorizedAccessException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -63,7 +63,7 @@ public class CommentServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetTaskCommentsReturnsAscendingCreationOrder()
+    public async global::System.Threading.Tasks.Task GetTaskCommentsAsync_MultipleComments_ReturnsAscendingCreationOrder()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");

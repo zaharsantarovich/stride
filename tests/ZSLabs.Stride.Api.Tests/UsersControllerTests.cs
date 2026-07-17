@@ -15,7 +15,7 @@ namespace ZSLabs.Stride.Api.Tests;
 public class UsersControllerTests
 {
     [Fact]
-    public void UserManagementActionsRequireAdminOnlyPolicy()
+    public void UserManagementActions_MultipleEndpoints_RequireAdminOnlyPolicy()
     {
         var getAttribute = typeof(UsersController)
             .GetMethod(nameof(UsersController.GetAsync))!
@@ -33,7 +33,7 @@ public class UsersControllerTests
     }
 
     [Fact]
-    public void RegularUserLookupRequiresRegularOnlyPolicy()
+    public void GetRegularUsersAsync_AuthorizationPolicy_RequiresRegularOnly()
     {
         var attribute = typeof(UsersController)
             .GetMethod(nameof(UsersController.GetRegularUsersAsync))!
@@ -44,7 +44,7 @@ public class UsersControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetRegularUsersAsyncReturnsLookupContracts()
+    public async global::System.Threading.Tasks.Task GetRegularUsersAsync_NoFilter_ReturnsLookupContracts()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var userService = Substitute.For<IUserService>();
@@ -66,7 +66,7 @@ public class UsersControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateAsyncReturnsConflictForDuplicateUsername()
+    public async global::System.Threading.Tasks.Task CreateAsync_DuplicateUsername_ReturnsConflict()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var userService = Substitute.For<IUserService>();
@@ -84,7 +84,7 @@ public class UsersControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateAsyncReturnsNotFoundForMissingUser()
+    public async global::System.Threading.Tasks.Task UpdateAsync_MissingUser_ReturnsNotFound()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var userService = Substitute.For<IUserService>();

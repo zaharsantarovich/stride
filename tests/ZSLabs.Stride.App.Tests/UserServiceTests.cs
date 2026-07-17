@@ -10,7 +10,7 @@ namespace ZSLabs.Stride.App.Tests;
 public class UserServiceTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task GetRegularUsersAsyncExcludesAdminsAndOrdersByUsername()
+    public async global::System.Threading.Tasks.Task GetRegularUsersAsync_AllUsers_ExcludesAdminsAndOrdersByUsername()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -33,7 +33,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateRegularUserAsyncPersistsHashedUser()
+    public async global::System.Threading.Tasks.Task CreateRegularUserAsync_NewUser_PersistsHashedPassword()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -51,7 +51,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateRegularUserAsyncUpdatesFieldsAndPassword()
+    public async global::System.Threading.Tasks.Task UpdateRegularUserAsync_AllFields_UpdatesFieldsAndPassword()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -75,7 +75,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DuplicateUsernameIsRejected()
+    public async global::System.Threading.Tasks.Task CreateRegularUserAsync_DuplicateUsername_ThrowsInvalidOperationException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");

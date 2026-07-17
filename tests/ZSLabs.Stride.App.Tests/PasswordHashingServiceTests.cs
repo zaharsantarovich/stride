@@ -7,7 +7,7 @@ namespace ZSLabs.Stride.App.Tests;
 public class PasswordHashingServiceTests
 {
     [Fact]
-    public void HashPasswordReturnsHashedValue()
+    public void HashPassword_ValidPassword_ReturnsHashedValue()
     {
         var service = new PasswordHashingService();
         var user = new User("user", string.Empty, null, UserRole.Regular, DateTime.UtcNow);
@@ -19,7 +19,7 @@ public class PasswordHashingServiceTests
     }
 
     [Fact]
-    public void VerifyPasswordReturnsTrueOnlyForMatchingPassword()
+    public void VerifyPassword_MatchingAndNonMatching_ReturnsCorrectBoolean()
     {
         var service = new PasswordHashingService();
         var user = new User("user", string.Empty, null, UserRole.Regular, DateTime.UtcNow);

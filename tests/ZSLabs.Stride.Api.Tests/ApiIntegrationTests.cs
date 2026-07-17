@@ -16,7 +16,7 @@ public class ApiIntegrationTests : IAsyncLifetime
     private readonly StrideApiFactory _factory = new();
 
     [Fact]
-    public async global::System.Threading.Tasks.Task SeededAdminCanManageUsersAndRegularUsersCannotAccessAdminEndpoints()
+    public async global::System.Threading.Tasks.Task UserManagement_AdminCreatesRegularUser_RegularUsersDeniedAdminAccess()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var suffix = Guid.NewGuid().ToString("N")[..8];
@@ -45,7 +45,7 @@ public class ApiIntegrationTests : IAsyncLifetime
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task RegularUsersCanCollaborateOnSpacesWithVisibilityRules()
+    public async global::System.Threading.Tasks.Task SpaceCollaboration_PublicPrivateVisibility_UsersObeyAccessRules()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var suffix = Guid.NewGuid().ToString("N")[..8];
@@ -83,7 +83,7 @@ public class ApiIntegrationTests : IAsyncLifetime
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task RegularUsersCanManageBoardTasksSubtasksAndComments()
+    public async global::System.Threading.Tasks.Task BoardWorkflow_FullTaskLifecycle_TasksSubtasksCommentsManaged()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var suffix = Guid.NewGuid().ToString("N")[..8];

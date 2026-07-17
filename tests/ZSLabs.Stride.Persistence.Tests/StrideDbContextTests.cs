@@ -13,7 +13,7 @@ namespace ZSLabs.Stride.Persistence.Tests;
 public class StrideDbContextTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteingASpaceCascadesToTasksSubtasksAndComments()
+    public async global::System.Threading.Tasks.Task SpaceDelete_RelatedTasksSubtasksAndComments_CascadesDelete()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
 
@@ -53,7 +53,7 @@ public class StrideDbContextTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UniqueConstraintsAreEnforcedForUsernameAndSpaceKey()
+    public async global::System.Threading.Tasks.Task DatabaseConstraints_UsernameAndSpaceKey_EnforcesUniqueness()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
 
@@ -81,7 +81,7 @@ public class StrideDbContextTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task MaterializedDateTimesAreTaggedAsUtc()
+    public async global::System.Threading.Tasks.Task DateTimeMaterialization_StoredDateTimes_TagsAsUtc()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
 

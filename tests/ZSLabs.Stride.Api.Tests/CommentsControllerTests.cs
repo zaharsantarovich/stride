@@ -14,7 +14,7 @@ namespace ZSLabs.Stride.Api.Tests;
 public class CommentsControllerTests
 {
     [Fact]
-    public void ControllerRequiresRegularOnlyPolicy()
+    public void CommentsController_ClassAttribute_RequiresRegularOnlyPolicy()
     {
         var attribute = typeof(CommentsController).GetCustomAttribute<AuthorizeAttribute>();
 
@@ -23,7 +23,7 @@ public class CommentsControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskCommentAsyncReturnsCreatedComment()
+    public async global::System.Threading.Tasks.Task CreateTaskCommentAsync_ValidRequest_ReturnsCreatedComment()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ICommentService>();
@@ -37,7 +37,7 @@ public class CommentsControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateAsyncReturnsForbiddenWhenActorIsNotAuthor()
+    public async global::System.Threading.Tasks.Task UpdateAsync_ActorNotAuthor_ReturnsForbidden()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ICommentService>();
@@ -52,7 +52,7 @@ public class CommentsControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteAsyncReturnsNoContent()
+    public async global::System.Threading.Tasks.Task DeleteAsync_ExistingComment_ReturnsNoContent()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ICommentService>();

@@ -15,7 +15,7 @@ namespace ZSLabs.Stride.Api.Tests;
 public class SpacesControllerTests
 {
     [Fact]
-    public void ControllerRequiresRegularOnlyPolicy()
+    public void SpacesController_ClassAttribute_RequiresRegularOnlyPolicy()
     {
         var attribute = typeof(SpacesController).GetCustomAttribute<AuthorizeAttribute>();
 
@@ -24,7 +24,7 @@ public class SpacesControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetByIdAsyncReturnsForbiddenForPrivateNoAccess()
+    public async global::System.Threading.Tasks.Task GetByIdAsync_PrivateSpaceNoAccess_ReturnsForbidden()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var spaceService = Substitute.For<ISpaceService>();
@@ -40,7 +40,7 @@ public class SpacesControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateAsyncReturnsConflictForDuplicateKey()
+    public async global::System.Threading.Tasks.Task CreateAsync_DuplicateKey_ReturnsConflict()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var spaceService = Substitute.For<ISpaceService>();
@@ -55,7 +55,7 @@ public class SpacesControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateAsyncReturnsForbiddenForNonAuthorVisibilityChange()
+    public async global::System.Threading.Tasks.Task UpdateAsync_NonAuthorVisibilityChange_ReturnsForbidden()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var spaceService = Substitute.For<ISpaceService>();

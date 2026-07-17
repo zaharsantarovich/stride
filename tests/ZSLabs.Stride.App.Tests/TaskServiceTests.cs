@@ -13,7 +13,7 @@ namespace ZSLabs.Stride.App.Tests;
 public class TaskServiceTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskDefaultsToBacklog()
+    public async global::System.Threading.Tasks.Task CreateTaskAsync_NoStatusProvided_DefaultsToBacklog()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -32,7 +32,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetTasksOrdersByPriorityThenCreatedAtWithinStatus()
+    public async global::System.Threading.Tasks.Task GetTasksAsync_MultiplePrioritiesAndDates_OrdersByPriorityThenCreatedAt()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -57,7 +57,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateTaskStatusPersistsChange()
+    public async global::System.Threading.Tasks.Task UpdateTaskStatusAsync_NewStatus_PersistsChange()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -79,7 +79,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskRejectsAssigneeWithoutSpaceAccess()
+    public async global::System.Threading.Tasks.Task CreateTaskAsync_AssigneeWithoutSpaceAccess_ThrowsInvalidOperationException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -97,7 +97,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskAllowsNullAssignee()
+    public async global::System.Threading.Tasks.Task CreateTaskAsync_NullAssignee_CreatesTask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -115,7 +115,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskAllowsPrivateSpaceCurrentUserAssignee()
+    public async global::System.Threading.Tasks.Task CreateTaskAsync_PrivateSpaceOwnerAssignee_CreatesTask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -133,7 +133,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskAllowsPublicSpaceRegularUserAssignee()
+    public async global::System.Threading.Tasks.Task CreateTaskAsync_PublicSpaceRegularUserAssignee_CreatesTask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -152,7 +152,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskRejectsAdminAssignee()
+    public async global::System.Threading.Tasks.Task CreateTaskAsync_AdminAssignee_ThrowsInvalidOperationException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -170,7 +170,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateTaskRejectsAdminAssignee()
+    public async global::System.Threading.Tasks.Task UpdateTaskAsync_AdminAssignee_ThrowsInvalidOperationException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -191,7 +191,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteTaskCascadesSubtasksAndComments()
+    public async global::System.Threading.Tasks.Task DeleteTaskAsync_TaskWithSubtasksAndComments_CascadesDelete()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");

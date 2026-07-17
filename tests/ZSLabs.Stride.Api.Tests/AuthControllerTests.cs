@@ -15,7 +15,7 @@ namespace ZSLabs.Stride.Api.Tests;
 public class AuthControllerTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task LoginAsyncReturnsCurrentUserAndSignsIn()
+    public async global::System.Threading.Tasks.Task LoginAsync_ValidCredentials_ReturnsCurrentUserAndSignsIn()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var authService = Substitute.For<IAuthService>();
@@ -38,7 +38,7 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task LoginAsyncReturnsGenericUnauthorizedForInvalidCredentials()
+    public async global::System.Threading.Tasks.Task LoginAsync_InvalidCredentials_ReturnsUnauthorized()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var authService = Substitute.For<IAuthService>();
@@ -55,7 +55,7 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task LogoutAsyncSignsOut()
+    public async global::System.Threading.Tasks.Task LogoutAsync_AuthenticatedUser_SignsOut()
     {
         var authService = Substitute.For<IAuthService>();
         var authenticationService = Substitute.For<IAuthenticationService>();
@@ -71,7 +71,7 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task MeAsyncReturnsUnauthorizedWithoutAuthenticatedUser()
+    public async global::System.Threading.Tasks.Task MeAsync_Unauthenticated_ReturnsUnauthorized()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var authService = Substitute.For<IAuthService>();
@@ -84,7 +84,7 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task MeAsyncReturnsCurrentUserForAuthenticatedRequest()
+    public async global::System.Threading.Tasks.Task MeAsync_Authenticated_ReturnsCurrentUser()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var authService = Substitute.For<IAuthService>();

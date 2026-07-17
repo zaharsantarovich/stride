@@ -15,7 +15,7 @@ namespace ZSLabs.Stride.Api.Tests;
 public class SubtasksControllerTests
 {
     [Fact]
-    public void ControllerRequiresRegularOnlyPolicy()
+    public void SubtasksController_ClassAttribute_RequiresRegularOnlyPolicy()
     {
         var attribute = typeof(SubtasksController).GetCustomAttribute<AuthorizeAttribute>();
 
@@ -24,7 +24,7 @@ public class SubtasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateAsyncReturnsCreatedSubtask()
+    public async global::System.Threading.Tasks.Task CreateAsync_ValidRequest_ReturnsCreatedSubtask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ISubtaskService>();
@@ -38,7 +38,7 @@ public class SubtasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateAsyncReturnsForbiddenForNoAccess()
+    public async global::System.Threading.Tasks.Task UpdateAsync_NoAccess_ReturnsForbidden()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ISubtaskService>();
@@ -53,7 +53,7 @@ public class SubtasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteAsyncReturnsNoContent()
+    public async global::System.Threading.Tasks.Task DeleteAsync_ExistingSubtask_ReturnsNoContent()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ISubtaskService>();
