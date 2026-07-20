@@ -29,20 +29,11 @@ export function SignInPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-5xl items-center px-6 py-12">
-      <section className="grid w-full gap-8 rounded-[2rem] border border-stride-border bg-stride-surface/90 p-8 shadow-board lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="space-y-4">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-stride-accent">Stride</p>
-          <h1 className="font-display text-4xl text-stride-ink sm:text-5xl">A calm board for shared planning.</h1>
-          <p className="max-w-xl text-base leading-7 text-stride-muted sm:text-lg">
-            Sign in to manage family spaces, task boards, subtasks, and comments. The seeded admin account is limited to user management.
-          </p>
-        </div>
+    <main className="mx-auto flex min-h-screen w-full max-w-md items-center px-6 py-12">
+      <section className="grid w-full gap-8 rounded-[2rem] border border-stride-border bg-stride-surface/90 p-8 shadow-board">
+        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-stride-accent">Stride</p>
         <form className="rounded-[1.5rem] border border-stride-border bg-stride-panel p-6" onSubmit={handleSubmit}>
           <h2 className="font-display text-2xl text-stride-ink">Sign in</h2>
-          <p className="mt-3 text-sm leading-6 text-stride-muted">
-            Use the seeded admin account or a regular user created by the admin.
-          </p>
           <div className="mt-6 space-y-4">
             <label className="block text-sm font-medium text-stride-ink">
               Username
