@@ -7,8 +7,6 @@ using ZSLabs.Stride.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers()
 	.AddJsonOptions(options =>
 	{
@@ -49,14 +47,17 @@ builder.Services.AddAuthorization(options =>
 	options.AddPolicy("RegularOnly", policy => policy.RequireRole("Regular"));
 });
 
-builder.Services.AddPersistence(builder.Configuration);
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<PasswordHashingService>();
-builder.Services.AddScoped<ISpaceService, SpaceService>();
-builder.Services.AddScoped<ISubtaskService, SubtaskService>();
-builder.Services.AddScoped<ITaskService, TaskService>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddOpenApi();
+
+builder.Services
+    .AddPersistence(builder.Configuration)
+    .AddScoped<IAuthService, AuthService>()
+    .AddScoped<ICommentService, CommentService>()
+    .AddScoped<PasswordHashingService>()
+    .AddScoped<ISpaceService, SpaceService>()
+    .AddScoped<ISubtaskService, SubtaskService>()
+    .AddScoped<ITaskService, TaskService>()
+    .AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 
@@ -71,6 +72,17 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+if (app.Environment.IsDevelopment())
+{
+    var opeApiUrl = "/openapi/v1.json";
+    app.MapOpenApi(opeApiUrl);
+
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint(opeApiUrl, "v1");
+    });
+}
 
 await app.Services.SeedAdminUserAsync(app.Configuration, app.Lifetime.ApplicationStopping);
 
