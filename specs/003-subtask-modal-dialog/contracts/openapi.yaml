@@ -1,0 +1,438 @@
+openapi: 3.0.3
+info:
+  title: Stride Dedicated Subtask Modal API
+  version: 1.0.0
+  description: >
+    Feature-level REST contract for loading, creating, updating, deleting, and
+    discussing subtasks in the dedicated modal. Authentication is cookie-based.
+    Audit timestamps are ISO-8601 UTC. Due dates are represented as UTC date-time
+    values but displayed and edited as calendar dates without a time component.
+
+servers:
+  - url: https://localhost:7080
+    description: Local development API
+
+tags:
+  - name: Tasks
+  - name: Subtasks
+  - name: Comments
+
+paths:
+  /spaces/{spaceId}/tasks:
+    get:
+      tags: [Tasks]
+      summary: Refresh board tasks and ordered subtask summaries
+      description: >
+        Returns accessible tasks. Each task's subtasks and nested comments are
+        ordered only by createdAt ascending, without a secondary sort key.
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: spaceId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Accessible tasks with chronologically ordered nested data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Task' }
+        '401': { description: Not authenticated. }
+        '403': { description: Current user cannot access the space. }
+        '404': { description: Space not found. }
+
+  /tasks/{taskId}/subtasks:
+    post:
+      tags: [Subtasks]
+      summary: Create a subtask for an existing parent task
+      description: >
+        Creates the subtask and returns the complete graph required to transition
+        the still-open modal from create mode to edit mode.
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSubtaskRequest' }
+      responses:
+        '201':
+          description: Created subtask with generated audit data and an empty comments array.
+          headers:
+            Location:
+              description: Canonical subtask resource path.
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subtask' }
+        '400':
+          description: Request validation failed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401': { description: Not authenticated. }
+        '403':
+          description: Current user cannot access the parent task's space.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404': { description: Parent task not found. }
+        '409':
+          description: Assignee is not eligible for the parent task's space.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /subtasks/{subtaskId}:
+    get:
+      tags: [Subtasks]
+      summary: Load one subtask for the dedicated modal
+      description: >
+        Returns an authoritative subtask graph after validating access to its
+        parent space. Comments are ordered only by createdAt ascending, without a
+        secondary sort key.
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SubtaskId'
+      responses:
+        '200':
+          description: Complete subtask modal data.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subtask' }
+        '401': { description: Not authenticated. }
+        '403':
+          description: Current user cannot access the parent task's space.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404': { description: Subtask or parent task not found. }
+
+    put:
+      tags: [Subtasks]
+      summary: Update editable subtask fields
+      description: >
+        Updates fields using existing validation and assignment rules. A successful
+        response is suitable for replacing the still-open modal state.
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SubtaskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateSubtaskRequest' }
+      responses:
+        '200':
+          description: Updated complete subtask graph.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subtask' }
+        '400':
+          description: Request validation failed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401': { description: Not authenticated. }
+        '403':
+          description: Current user cannot access the parent task's space.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404': { description: Subtask or parent task not found. }
+        '409':
+          description: Assignee is not eligible for the parent task's space.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    delete:
+      tags: [Subtasks]
+      summary: Permanently delete a subtask and its comments
+      description: >
+        The API performs a hard delete after access validation. Existing EF Core
+        cascade behavior deletes child comments. Confirmation and launch-surface
+        restoration are client responsibilities.
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SubtaskId'
+      responses:
+        '204': { description: Subtask and child comments deleted. }
+        '401': { description: Not authenticated. }
+        '403':
+          description: Current user cannot access the parent task's space.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404': { description: Subtask or parent task not found. }
+
+  /subtasks/{subtaskId}/comments:
+    post:
+      tags: [Comments]
+      summary: Add a comment to a persisted subtask
+      description: >
+        The subtask must already exist. The returned comment includes its author
+        username and generated timestamps.
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SubtaskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCommentRequest' }
+      responses:
+        '201':
+          description: Created comment.
+          headers:
+            Location:
+              description: Canonical comment resource path.
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Comment' }
+        '400':
+          description: Comment validation failed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401': { description: Not authenticated. }
+        '403':
+          description: Current user cannot access the parent space.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404': { description: Subtask or parent task not found. }
+
+  /comments/{commentId}:
+    put:
+      tags: [Comments]
+      summary: Edit an owned comment
+      description: >
+        Revalidates current parent-space access and requires the current user to
+        remain the comment author.
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/CommentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCommentRequest' }
+      responses:
+        '200':
+          description: Updated comment with author username and updatedAt populated.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Comment' }
+        '400':
+          description: Comment validation failed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401': { description: Not authenticated. }
+        '403':
+          description: Current user is not the author or no longer has parent-space access.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404': { description: Comment or parent resource not found. }
+
+    delete:
+      tags: [Comments]
+      summary: Permanently delete an owned comment
+      description: >
+        Revalidates current parent-space access and requires the current user to
+        remain the comment author.
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/CommentId'
+      responses:
+        '204': { description: Comment deleted. }
+        '401': { description: Not authenticated. }
+        '403':
+          description: Current user is not the author or no longer has parent-space access.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404': { description: Comment or parent resource not found. }
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: Stride.Auth
+
+  parameters:
+    SubtaskId:
+      name: subtaskId
+      in: path
+      required: true
+      schema: { type: integer }
+    CommentId:
+      name: commentId
+      in: path
+      required: true
+      schema: { type: integer }
+
+  schemas:
+    TaskStatus:
+      type: string
+      enum: [Backlog, Todo, InProgress, Done, Archived]
+
+    TaskPriority:
+      type: string
+      enum: [Low, Medium, High, Critical]
+
+    SubtaskStatus:
+      type: string
+      enum: [Todo, InProgress, Done]
+
+    Task:
+      type: object
+      required:
+        - id
+        - spaceId
+        - title
+        - status
+        - priority
+        - authorId
+        - createdAt
+        - subtasks
+        - comments
+      properties:
+        id: { type: integer }
+        spaceId: { type: integer }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/TaskStatus' }
+        priority: { $ref: '#/components/schemas/TaskPriority' }
+        authorId: { type: integer }
+        assigneeId: { type: integer, nullable: true }
+        assigneeUsername: { type: string, nullable: true }
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Displayed and edited as a calendar date only.
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time, nullable: true }
+        subtasks:
+          type: array
+          description: Ordered only by createdAt ascending.
+          items: { $ref: '#/components/schemas/Subtask' }
+        comments:
+          type: array
+          items: { $ref: '#/components/schemas/Comment' }
+
+    Subtask:
+      type: object
+      required:
+        - id
+        - taskId
+        - title
+        - status
+        - authorId
+        - authorUsername
+        - createdAt
+        - comments
+      properties:
+        id: { type: integer }
+        taskId: { type: integer }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/SubtaskStatus' }
+        authorId: { type: integer }
+        authorUsername: { type: string }
+        assigneeId:
+          type: integer
+          nullable: true
+          description: Null or an eligible regular user for the parent task's space.
+        assigneeUsername: { type: string, nullable: true }
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Displayed and edited as a calendar date only.
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time, nullable: true }
+        comments:
+          type: array
+          description: Ordered only by createdAt ascending.
+          items: { $ref: '#/components/schemas/Comment' }
+
+    Comment:
+      type: object
+      required:
+        - id
+        - authorId
+        - authorUsername
+        - content
+        - createdAt
+      properties:
+        id: { type: integer }
+        taskId: { type: integer, nullable: true }
+        subtaskId: { type: integer, nullable: true }
+        authorId: { type: integer }
+        authorUsername: { type: string }
+        content: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null until the comment is edited.
+
+    CreateSubtaskRequest:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1 }
+        description: { type: string, nullable: true }
+        status:
+          allOf: [{ $ref: '#/components/schemas/SubtaskStatus' }]
+          description: Optional; defaults to Todo when omitted.
+        assigneeId:
+          type: integer
+          nullable: true
+          description: Null or an eligible regular user for the parent task's space.
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Calendar date serialized through the existing UTC conversion.
+
+    UpdateSubtaskRequest:
+      type: object
+      properties:
+        title: { type: string, minLength: 1 }
+        description: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/SubtaskStatus' }
+        assigneeId:
+          type: integer
+          nullable: true
+          description: Null or an eligible regular user for the parent task's space.
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Calendar date serialized through the existing UTC conversion.
+
+    CreateCommentRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string, minLength: 1 }
+
+    ErrorResponse:
+      type: object
+      required: [message]
+      properties:
+        message: { type: string }
