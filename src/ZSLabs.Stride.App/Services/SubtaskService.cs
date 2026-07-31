@@ -15,6 +15,16 @@ public class SubtaskService : ISubtaskService
         _dbContext = dbContext;
     }
 
+    public async Task<Subtask> GetSubtaskAsync(int subtaskId, int actorId, CancellationToken cancellationToken)
+    {
+        var subtask = await LoadSubtaskGraphAsync(subtaskId, cancellationToken);
+        var task = await FindTaskAsync(subtask.TaskId, cancellationToken);
+        var space = await FindSpaceAsync(task.SpaceId, cancellationToken);
+        EnsureCanAccessSpace(space, actorId);
+
+        return subtask;
+    }
+
     public async Task<Subtask> CreateSubtaskAsync(
         int taskId,
         int actorId,
@@ -96,8 +106,10 @@ public class SubtaskService : ISubtaskService
     private IQueryable<Subtask> QuerySubtasks()
     {
         return _dbContext.Subtasks
+            .Include(subtask => subtask.Author)
             .Include(subtask => subtask.Assignee)
-            .Include(subtask => subtask.Comments.OrderBy(comment => comment.CreatedAt));
+            .Include(subtask => subtask.Comments.OrderBy(comment => comment.CreatedAt))
+            .ThenInclude(comment => comment.Author);
     }
 
     private async Task<TaskEntity> FindTaskAsync(int taskId, CancellationToken cancellationToken)
@@ -124,7 +136,8 @@ public class SubtaskService : ISubtaskService
     private async Task<Subtask> LoadSubtaskGraphAsync(int subtaskId, CancellationToken cancellationToken)
     {
         return await QuerySubtasks()
-            .SingleAsync(subtask => subtask.Id == subtaskId, cancellationToken);
+            .SingleOrDefaultAsync(subtask => subtask.Id == subtaskId, cancellationToken)
+            ?? throw new KeyNotFoundException("Subtask not found.");
     }
 
     private async global::System.Threading.Tasks.Task EnsureAssigneeHasSpaceAccessAsync(Space space, int? assigneeId, CancellationToken cancellationToken)

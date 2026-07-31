@@ -131,10 +131,14 @@ public class TaskService : ITaskService
         return _dbContext.Tasks
             .Include(task => task.Assignee)
             .Include(task => task.Subtasks.OrderBy(subtask => subtask.CreatedAt))
+            .ThenInclude(subtask => subtask.Author)
+            .Include(task => task.Subtasks.OrderBy(subtask => subtask.CreatedAt))
             .ThenInclude(subtask => subtask.Assignee)
             .Include(task => task.Subtasks.OrderBy(subtask => subtask.CreatedAt))
             .ThenInclude(subtask => subtask.Comments.OrderBy(comment => comment.CreatedAt))
-            .Include(task => task.Comments.OrderBy(comment => comment.CreatedAt));
+            .ThenInclude(comment => comment.Author)
+            .Include(task => task.Comments.OrderBy(comment => comment.CreatedAt))
+            .ThenInclude(comment => comment.Author);
     }
 
     private async Task<Space> FindSpaceAsync(int spaceId, CancellationToken cancellationToken)

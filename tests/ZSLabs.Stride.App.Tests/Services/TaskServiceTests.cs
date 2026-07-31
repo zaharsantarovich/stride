@@ -57,6 +57,40 @@ public class TaskServiceTests
     }
 
     [Fact]
+    public async global::System.Threading.Tasks.Task GetTasksAsync_SubtasksWithVariedFields_OrdersOnlyByCreatedAtIncludingTies()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", UserRole.Regular, cancellationToken);
+        var assignee = await AddUserAsync(context, "assignee", UserRole.Regular, cancellationToken);
+        var space = await AddSpaceAsync(context, owner.Id, true, cancellationToken);
+        var task = new TaskEntity(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Medium, owner.Id, null, null, DateTime.UtcNow);
+        context.Tasks.Add(task);
+        await context.SaveChangesAsync(cancellationToken);
+        var tiedAt = DateTime.UtcNow;
+        context.Subtasks.AddRange(
+            new Subtask(task.Id, "newest", null, SubtaskStatus.Todo, owner.Id, null, null, tiedAt.AddMinutes(1)),
+            new Subtask(task.Id, "tie-done", null, SubtaskStatus.Done, owner.Id, assignee.Id, null, tiedAt),
+            new Subtask(task.Id, "oldest", null, SubtaskStatus.InProgress, owner.Id, assignee.Id, null, tiedAt.AddMinutes(-1)),
+            new Subtask(task.Id, "tie-todo", null, SubtaskStatus.Todo, owner.Id, null, null, tiedAt));
+        await context.SaveChangesAsync(cancellationToken);
+        context.ChangeTracker.Clear();
+
+        var result = Assert.Single(await new TaskService(context).GetTasksAsync(space.Id, owner.Id, cancellationToken));
+        var ordered = result.Subtasks.ToList();
+
+        Assert.Equal("oldest", ordered[0].Title);
+        Assert.Equal("newest", ordered[^1].Title);
+        Assert.Equal(tiedAt, ordered[1].CreatedAt);
+        Assert.Equal(tiedAt, ordered[2].CreatedAt);
+        Assert.Equal(["tie-done", "tie-todo"], ordered.Skip(1).Take(2).Select(subtask => subtask.Title).Order());
+    }
+
+    [Fact]
     public async global::System.Threading.Tasks.Task UpdateTaskStatusAsync_NewStatus_PersistsChange()
     {
         var cancellationToken = TestContext.Current.CancellationToken;

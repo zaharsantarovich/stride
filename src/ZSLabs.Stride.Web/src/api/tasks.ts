@@ -31,6 +31,10 @@ export function deleteTask(taskId: number) {
   return apiRequest<void>(`/tasks/${taskId}`, 'DELETE')
 }
 
+export function getSubtask(subtaskId: number) {
+  return apiRequest<Subtask>(`/subtasks/${subtaskId}`)
+}
+
 export function createSubtask(taskId: number, request: CreateSubtaskRequest) {
   return apiRequest<Subtask>(`/tasks/${taskId}/subtasks`, 'POST', request)
 }

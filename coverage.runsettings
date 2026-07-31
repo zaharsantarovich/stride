@@ -5,7 +5,7 @@
       <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <Exclude>[ZSLabs.Stride.Api]ZSLabs.Stride.Api.Contracts.*,[ZSLabs.Stride.Domain]ZSLabs.Stride.Domain.Entities.*,[ZSLabs.Stride.Api]Program,[ZSLabs.Stride.Api]ZSLabs.Stride.Api.Middleware.ExceptionHandlingMiddleware,[ZSLabs.Stride.Persistence]ZSLabs.Stride.Persistence.DependencyInjection,[ZSLabs.Stride.Persistence]ZSLabs.Stride.Persistence.StrideDbContextFactory</Exclude>
-          <ExcludeByFile>**/Migrations/*.cs</ExcludeByFile>
+          <ExcludeByFile>**/Migrations/*.cs,**/obj/**/*.cs</ExcludeByFile>
         </Configuration>
       </DataCollector>
     </DataCollectors>

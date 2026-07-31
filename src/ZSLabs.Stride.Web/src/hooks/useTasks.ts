@@ -1,23 +1,17 @@
 import { useEffect, useState } from 'react'
 import { ApiError } from '../api/client'
 import {
-  createSubtask,
   createTask,
-  deleteSubtask,
   deleteTask,
   getTasks,
-  updateSubtask,
   updateTask,
   updateTaskStatus,
 } from '../api/tasks'
 import type {
-  CreateSubtaskRequest,
   CreateTaskRequest,
-  SubtaskStatus,
   Task,
   TaskPriority,
   TaskStatus,
-  UpdateSubtaskRequest,
   UpdateTaskRequest,
 } from '../api/contracts'
 
@@ -27,16 +21,6 @@ const priorityRank: Record<TaskPriority, number> = {
   High: 1,
   Medium: 2,
   Low: 3,
-}
-
-export interface SubtaskDraftSave {
-  id?: number
-  title: string
-  description: string | null
-  status: SubtaskStatus
-  assigneeId: number | null
-  dueDate: string | null
-  isDeleted?: boolean
 }
 
 function sortTasks(tasks: Task[]) {
@@ -95,24 +79,15 @@ export function useTasks(spaceId: number) {
 
   async function refreshTasks() {
     const nextTasks = await getTasks(spaceId)
-    setTasks(sortTasks(nextTasks))
+    const sortedTasks = sortTasks(nextTasks)
+    setTasks(sortedTasks)
     setErrorMessage(null)
+    return sortedTasks
   }
 
-  async function addTaskWithSubtasks(request: CreateTaskRequest, subtasks: SubtaskDraftSave[]) {
+  async function addTask(request: CreateTaskRequest) {
     try {
       const created = await createTask(spaceId, request)
-
-      for (const subtask of subtasks.filter((candidate) => !candidate.isDeleted && candidate.title.trim().length > 0)) {
-        await createSubtask(created.id, {
-          title: subtask.title.trim(),
-          description: subtask.description?.trim() || null,
-          status: subtask.status,
-          assigneeId: subtask.assigneeId,
-          dueDate: subtask.dueDate,
-        })
-      }
-
       await refreshTasks()
       setErrorMessage(null)
       return created
@@ -123,35 +98,9 @@ export function useTasks(spaceId: number) {
     }
   }
 
-  async function saveTaskWithSubtasks(taskId: number, request: UpdateTaskRequest, subtasks: SubtaskDraftSave[]) {
+  async function saveTask(taskId: number, request: UpdateTaskRequest) {
     try {
       const updated = await updateTask(taskId, request)
-
-      for (const subtask of subtasks) {
-        if (subtask.id !== undefined && subtask.isDeleted) {
-          await deleteSubtask(subtask.id)
-          continue
-        }
-
-        if (subtask.isDeleted || subtask.title.trim().length === 0) {
-          continue
-        }
-
-        const subtaskRequest = {
-          title: subtask.title.trim(),
-          description: subtask.description?.trim() || null,
-          status: subtask.status,
-          assigneeId: subtask.assigneeId,
-          dueDate: subtask.dueDate,
-        }
-
-        if (subtask.id === undefined) {
-          await createSubtask(taskId, subtaskRequest)
-        } else {
-          await updateSubtask(subtask.id, subtaskRequest)
-        }
-      }
-
       await refreshTasks()
       setErrorMessage(null)
       return updated
@@ -190,50 +139,14 @@ export function useTasks(spaceId: number) {
     }
   }
 
-  async function addSubtask(taskId: number, request: CreateSubtaskRequest) {
-    try {
-      await createSubtask(taskId, request)
-      await refreshTasks()
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Unable to create subtask.'
-      setErrorMessage(message)
-      throw error
-    }
-  }
-
-  async function saveSubtask(subtaskId: number, request: UpdateSubtaskRequest) {
-    try {
-      await updateSubtask(subtaskId, request)
-      await refreshTasks()
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Unable to update subtask.'
-      setErrorMessage(message)
-      throw error
-    }
-  }
-
-  async function removeSubtask(subtaskId: number) {
-    try {
-      await deleteSubtask(subtaskId)
-      await refreshTasks()
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Unable to delete subtask.'
-      setErrorMessage(message)
-      throw error
-    }
-  }
-
   return {
     tasks,
     isLoading,
     errorMessage,
     refreshTasks,
-    addTaskWithSubtasks,
-    saveTaskWithSubtasks,
+    addTask,
+    saveTask,
     moveTask,
     removeTask,
-    addSubtask,
-    saveSubtask,
-    removeSubtask,
   }
 }

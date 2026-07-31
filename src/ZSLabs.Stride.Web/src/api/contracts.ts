@@ -69,6 +69,7 @@ export interface Comment {
   taskId: number | null
   subtaskId: number | null
   authorId: number
+  authorUsername: string
   content: string
   createdAt: string
   updatedAt?: string | null
@@ -81,6 +82,7 @@ export interface Subtask {
   description: string | null
   status: SubtaskStatus
   authorId: number
+  authorUsername: string
   assigneeId: number | null
   assigneeUsername: string | null
   dueDate: string | null

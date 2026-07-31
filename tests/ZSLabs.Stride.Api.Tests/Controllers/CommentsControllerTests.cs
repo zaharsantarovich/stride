@@ -8,6 +8,8 @@ using ZSLabs.Stride.Api.Contracts;
 using ZSLabs.Stride.Api.Controllers;
 using ZSLabs.Stride.App.Services;
 using DomainComment = ZSLabs.Stride.Domain.Entities.Comment;
+using DomainUser = ZSLabs.Stride.Domain.Entities.User;
+using UserRole = ZSLabs.Stride.Domain.Enums.UserRole;
 
 namespace ZSLabs.Stride.Api.Tests.Controllers;
 
@@ -27,13 +29,30 @@ public class CommentsControllerTests
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ICommentService>();
+        var author = new DomainUser("author", "hash", null, UserRole.Regular, DateTime.UtcNow) { Id = 8 };
         service.CreateTaskCommentAsync(4, 8, "Comment", cancellationToken)
-            .Returns(new DomainComment(4, null, 8, "Comment", DateTime.UtcNow));
+            .Returns(new DomainComment(4, null, 8, "Comment", DateTime.UtcNow) { Author = author });
 
         var controller = CreateController(service, 8);
         var result = await controller.CreateTaskCommentAsync(4, new CreateCommentRequest("Comment"), cancellationToken);
 
-        Assert.IsType<CreatedResult>(result.Result);
+        var response = Assert.IsType<CreatedResult>(result.Result);
+        Assert.Equal("author", Assert.IsType<Comment>(response.Value).AuthorUsername);
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task UpdateAsync_OwnedComment_ReturnsMappedAuthorUsername()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var service = Substitute.For<ICommentService>();
+        var author = new DomainUser("author", "hash", null, UserRole.Regular, DateTime.UtcNow) { Id = 8 };
+        service.UpdateCommentAsync(9, 8, "Updated", cancellationToken)
+            .Returns(new DomainComment(4, null, 8, "Updated", DateTime.UtcNow) { Id = 9, Author = author, UpdatedAt = DateTime.UtcNow });
+
+        var result = await CreateController(service, 8).UpdateAsync(9, new CreateCommentRequest("Updated"), cancellationToken);
+
+        var response = Assert.IsType<OkObjectResult>(result.Result);
+        Assert.Equal("author", Assert.IsType<Comment>(response.Value).AuthorUsername);
     }
 
     [Fact]
@@ -61,6 +80,20 @@ public class CommentsControllerTests
         var result = await controller.DeleteAsync(9, cancellationToken);
 
         Assert.IsType<NoContentResult>(result);
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task DeleteAsync_ActorNotAuthor_ReturnsForbidden()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var service = Substitute.For<ICommentService>();
+        service.DeleteCommentAsync(9, 8, cancellationToken)
+            .Returns(_ => global::System.Threading.Tasks.Task.FromException(new UnauthorizedAccessException("Only the author can modify this comment.")));
+
+        var result = await CreateController(service, 8).DeleteAsync(9, cancellationToken);
+
+        var response = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(StatusCodes.Status403Forbidden, response.StatusCode);
     }
 
     private static CommentsController CreateController(ICommentService service, int userId)

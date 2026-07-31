@@ -13,6 +13,70 @@ namespace ZSLabs.Stride.App.Tests.Services;
 public class SubtaskServiceTests
 {
     [Fact]
+    public async global::System.Threading.Tasks.Task GetSubtaskAsync_AccessibleSubtask_LoadsCompleteOrderedGraph()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", cancellationToken);
+        var assignee = await AddUserAsync(context, "assignee", cancellationToken);
+        var commenter = await AddUserAsync(context, "commenter", cancellationToken);
+        var task = await AddTaskAsync(context, owner.Id, true, cancellationToken);
+        var subtask = new Subtask(task.Id, "Subtask", null, SubtaskStatus.Todo, owner.Id, assignee.Id, null, DateTime.UtcNow);
+        context.Subtasks.Add(subtask);
+        await context.SaveChangesAsync(cancellationToken);
+        var createdAt = DateTime.UtcNow;
+        context.Comments.AddRange(
+            new Comment(null, subtask.Id, commenter.Id, "Later", createdAt.AddMinutes(1)),
+            new Comment(null, subtask.Id, owner.Id, "Earlier", createdAt));
+        await context.SaveChangesAsync(cancellationToken);
+        context.ChangeTracker.Clear();
+
+        var result = await new SubtaskService(context).GetSubtaskAsync(subtask.Id, owner.Id, cancellationToken);
+
+        Assert.Equal("owner", result.Author?.Username);
+        Assert.Equal("assignee", result.Assignee?.Username);
+        Assert.Equal(["Earlier", "Later"], result.Comments.Select(comment => comment.Content));
+        Assert.Equal(["owner", "commenter"], result.Comments.Select(comment => comment.Author?.Username));
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task GetSubtaskAsync_InaccessiblePrivateSpace_ThrowsUnauthorizedAccessException()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", cancellationToken);
+        var other = await AddUserAsync(context, "other", cancellationToken);
+        var task = await AddTaskAsync(context, owner.Id, false, cancellationToken);
+        var subtask = new Subtask(task.Id, "Subtask", null, SubtaskStatus.Todo, owner.Id, null, null, DateTime.UtcNow);
+        context.Subtasks.Add(subtask);
+        await context.SaveChangesAsync(cancellationToken);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+            new SubtaskService(context).GetSubtaskAsync(subtask.Id, other.Id, cancellationToken));
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task GetSubtaskAsync_MissingSubtask_ThrowsKeyNotFoundException()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            new SubtaskService(context).GetSubtaskAsync(999, 1, cancellationToken));
+    }
+
+    [Fact]
     public async global::System.Threading.Tasks.Task CreateSubtaskAsync_NoStatusProvided_DefaultsToTodo()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
@@ -28,6 +92,11 @@ public class SubtaskServiceTests
         var subtask = await service.CreateSubtaskAsync(task.Id, owner.Id, "Subtask", null, null, null, null, cancellationToken);
 
         Assert.Equal(SubtaskStatus.Todo, subtask.Status);
+        Assert.True(subtask.Id > 0);
+        Assert.Equal("owner", subtask.Author?.Username);
+        Assert.NotEqual(default, subtask.CreatedAt);
+        Assert.Null(subtask.UpdatedAt);
+        Assert.Empty(subtask.Comments);
     }
 
     [Fact]

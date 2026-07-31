@@ -35,6 +35,8 @@ public class CommentServiceTests
         Assert.Null(taskComment.SubtaskId);
         Assert.Null(subtaskComment.TaskId);
         Assert.Equal(subtask.Id, subtaskComment.SubtaskId);
+        Assert.Equal("owner", taskComment.Author?.Username);
+        Assert.Equal("owner", subtaskComment.Author?.Username);
     }
 
     [Fact]
@@ -83,6 +85,81 @@ public class CommentServiceTests
         var comments = await service.GetTaskCommentsAsync(task.Id, owner.Id, cancellationToken);
 
         Assert.Equal(new[] { "First", "Second", "Third" }, comments.Select(comment => comment.Content));
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task GetSubtaskCommentsAsync_MultipleAuthors_ReturnsOrderedAuthorGraph()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", cancellationToken);
+        var other = await AddUserAsync(context, "other", cancellationToken);
+        var task = await AddTaskAsync(context, owner.Id, true, cancellationToken);
+        var subtask = new Subtask(task.Id, "Subtask", null, SubtaskStatus.Todo, owner.Id, null, null, DateTime.UtcNow);
+        context.Subtasks.Add(subtask);
+        await context.SaveChangesAsync(cancellationToken);
+        var createdAt = DateTime.UtcNow;
+        context.Comments.AddRange(
+            new Comment(null, subtask.Id, other.Id, "Later", createdAt.AddMinutes(1)),
+            new Comment(null, subtask.Id, owner.Id, "Earlier", createdAt));
+        await context.SaveChangesAsync(cancellationToken);
+        context.ChangeTracker.Clear();
+
+        var comments = await new CommentService(context).GetSubtaskCommentsAsync(subtask.Id, owner.Id, cancellationToken);
+
+        Assert.Equal(["Earlier", "Later"], comments.Select(comment => comment.Content));
+        Assert.Equal(["owner", "other"], comments.Select(comment => comment.Author?.Username));
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task UpdateCommentAsync_AuthorWithCurrentAccess_UpdatesAndLoadsAuthor()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", cancellationToken);
+        var task = await AddTaskAsync(context, owner.Id, true, cancellationToken);
+        var comment = new Comment(task.Id, null, owner.Id, "Original", DateTime.UtcNow);
+        context.Comments.Add(comment);
+        await context.SaveChangesAsync(cancellationToken);
+        context.ChangeTracker.Clear();
+
+        var updated = await new CommentService(context).UpdateCommentAsync(comment.Id, owner.Id, "Updated", cancellationToken);
+
+        Assert.Equal("Updated", updated.Content);
+        Assert.Equal("owner", updated.Author?.Username);
+        Assert.NotNull(updated.UpdatedAt);
+    }
+
+    [Fact]
+    public async global::System.Threading.Tasks.Task CommentModification_AuthorWhoLostParentSpaceAccess_ThrowsUnauthorizedAccessException()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using var context = CreateContext(connection);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        var owner = await AddUserAsync(context, "owner", cancellationToken);
+        var other = await AddUserAsync(context, "other", cancellationToken);
+        var task = await AddTaskAsync(context, owner.Id, true, cancellationToken);
+        var comment = new Comment(task.Id, null, other.Id, "Original", DateTime.UtcNow);
+        context.Comments.Add(comment);
+        await context.SaveChangesAsync(cancellationToken);
+        var space = await context.Spaces.SingleAsync(cancellationToken);
+        space.IsPublic = false;
+        await context.SaveChangesAsync(cancellationToken);
+
+        var service = new CommentService(context);
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => service.UpdateCommentAsync(comment.Id, other.Id, "Updated", cancellationToken));
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => service.DeleteCommentAsync(comment.Id, other.Id, cancellationToken));
     }
 
     private static async Task<User> AddUserAsync(StrideDbContext context, string username, CancellationToken cancellationToken)

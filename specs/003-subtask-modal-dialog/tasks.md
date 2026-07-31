@@ -18,7 +18,7 @@
 
 **Purpose**: Establish a known-good baseline without adding dependencies or changing the existing project structure.
 
-- [ ] T001 Restore and run the existing backend and frontend baseline checks against `Stride.sln` and `src/ZSLabs.Stride.Web/package.json`, recording any pre-existing failures before implementation
+- [X] T001 Restore and run the existing backend and frontend baseline checks against `Stride.sln` and `src/ZSLabs.Stride.Web/package.json`, recording any pre-existing failures before implementation
 
 ---
 
@@ -28,8 +28,8 @@
 
 **CRITICAL**: Complete this phase before user-story work begins.
 
-- [ ] T002 Add required `AuthorUsername` fields to the shared response records in `src/ZSLabs.Stride.Api/Contracts/Subtask.cs` and `src/ZSLabs.Stride.Api/Contracts/Comment.cs`
-- [ ] T003 [P] Mirror required subtask and comment author username fields in `src/ZSLabs.Stride.Web/src/api/contracts.ts`
+- [X] T002 Add required `AuthorUsername` fields to the shared response records in `src/ZSLabs.Stride.Api/Contracts/Subtask.cs` and `src/ZSLabs.Stride.Api/Contracts/Comment.cs`
+- [X] T003 [P] Mirror required subtask and comment author username fields in `src/ZSLabs.Stride.Web/src/api/contracts.ts`
 
 **Checkpoint**: Backend and frontend types match `specs/003-subtask-modal-dialog/contracts/openapi.yaml`.
 
@@ -43,18 +43,18 @@
 
 ### Tests for User Story 1
 
-- [ ] T004 [P] [US1] Add service tests for authorized single-subtask retrieval, complete author/assignee/comment-author graph loading, chronological comment order, inaccessible-space rejection, and missing IDs in `tests/ZSLabs.Stride.App.Tests/Services/SubtaskServiceTests.cs`
-- [ ] T005 [P] [US1] Add controller tests for `GET /subtasks/{subtaskId}` success mapping plus forbidden and not-found responses in `tests/ZSLabs.Stride.Api.Tests/Controllers/SubtasksControllerTests.cs`
+- [X] T004 [P] [US1] Add service tests for authorized single-subtask retrieval, complete author/assignee/comment-author graph loading, chronological comment order, inaccessible-space rejection, and missing IDs in `tests/ZSLabs.Stride.App.Tests/Services/SubtaskServiceTests.cs`
+- [X] T005 [P] [US1] Add controller tests for `GET /subtasks/{subtaskId}` success mapping plus forbidden and not-found responses in `tests/ZSLabs.Stride.Api.Tests/Controllers/SubtasksControllerTests.cs`
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] Add the authorized single-subtask query and author/comment-author includes in `src/ZSLabs.Stride.App/Services/ISubtaskService.cs` and `src/ZSLabs.Stride.App/Services/SubtaskService.cs`
-- [ ] T007 [US1] Add `GET /subtasks/{subtaskId}` and complete subtask/comment response mapping in `src/ZSLabs.Stride.Api/Controllers/SubtasksController.cs`
-- [ ] T008 [P] [US1] Add the typed single-subtask request in `src/ZSLabs.Stride.Web/src/api/tasks.ts`
-- [ ] T009 [P] [US1] Extract date-only input conversion from the task dialog into `src/ZSLabs.Stride.Web/src/utils/dateOnly.ts` and consume it from `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`
-- [ ] T010 [US1] Create focused load, update, delete, refresh, and recoverable-error state for one subtask in `src/ZSLabs.Stride.Web/src/hooks/useSubtask.ts`
-- [ ] T011 [US1] Build existing-subtask mode with editable fields, read-only author/audit values, date-only due date, ordered read-only comments, save-in-place, and confirmed deletion in `src/ZSLabs.Stride.Web/src/components/SubtaskModal.tsx`
-- [ ] T012 [US1] Extend the discriminated single-modal coordinator to render existing subtask state without stacking dialogs in `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`
+- [X] T006 [US1] Add the authorized single-subtask query and author/comment-author includes in `src/ZSLabs.Stride.App/Services/ISubtaskService.cs` and `src/ZSLabs.Stride.App/Services/SubtaskService.cs`
+- [X] T007 [US1] Add `GET /subtasks/{subtaskId}` and complete subtask/comment response mapping in `src/ZSLabs.Stride.Api/Controllers/SubtasksController.cs`
+- [X] T008 [P] [US1] Add the typed single-subtask request in `src/ZSLabs.Stride.Web/src/api/tasks.ts`
+- [X] T009 [P] [US1] Extract date-only input conversion from the task dialog into `src/ZSLabs.Stride.Web/src/utils/dateOnly.ts` and consume it from `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`
+- [X] T010 [US1] Create focused load, update, delete, refresh, and recoverable-error state for one subtask in `src/ZSLabs.Stride.Web/src/hooks/useSubtask.ts`
+- [X] T011 [US1] Build existing-subtask mode with editable fields, read-only author/audit values, date-only due date, ordered read-only comments, save-in-place, and confirmed deletion in `src/ZSLabs.Stride.Web/src/components/SubtaskModal.tsx`
+- [X] T012 [US1] Extend the discriminated single-modal coordinator to render existing subtask state without stacking dialogs in `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`
 
 **Checkpoint**: The dedicated modal can authoritatively load, update, and delete an existing subtask while preserving retryable input and existing validation.
 
@@ -68,14 +68,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T013 [P] [US2] Add regression tests proving task responses order subtasks only by `CreatedAt` ascending, including equal timestamps without an ID tie-breaker, in `tests/ZSLabs.Stride.App.Tests/Services/TaskServiceTests.cs`
+- [X] T013 [P] [US2] Add regression tests proving task responses order subtasks only by `CreatedAt` ascending, including equal timestamps without an ID tie-breaker, in `tests/ZSLabs.Stride.App.Tests/Services/TaskServiceTests.cs`
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Make task-query subtask ordering authoritative and creation-time-only in `src/ZSLabs.Stride.App/Services/TaskService.cs`
-- [ ] T015 [P] [US2] Replace embedded subtask forms with an ordered Title/Status/Assignee table, empty state, and semantic title links in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`
-- [ ] T016 [P] [US2] Render ordered semantic subtask title links with accessible names and card click/drag isolation in `src/ZSLabs.Stride.Web/src/components/TaskCard.tsx`
-- [ ] T017 [US2] Route subtask-link callbacks through the board into the single modal coordinator in `src/ZSLabs.Stride.Web/src/components/Board.tsx` and `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`
+- [X] T014 [US2] Make task-query subtask ordering authoritative and creation-time-only in `src/ZSLabs.Stride.App/Services/TaskService.cs`
+- [X] T015 [P] [US2] Replace embedded subtask forms with an ordered Title/Status/Assignee table, empty state, and semantic title links in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`
+- [X] T016 [P] [US2] Render ordered semantic subtask title links with accessible names and card click/drag isolation in `src/ZSLabs.Stride.Web/src/components/TaskCard.tsx`
+- [X] T017 [US2] Route subtask-link callbacks through the board into the single modal coordinator in `src/ZSLabs.Stride.Web/src/components/Board.tsx` and `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`
 
 **Checkpoint**: Both launch surfaces open the same modal, remain keyboard/touch operable, and show subtasks from earliest to latest creation time.
 
@@ -89,13 +89,13 @@
 
 ### Tests for User Story 3
 
-- [ ] T018 [P] [US3] Add create-response tests for generated audit values, author username, empty comments, assignment validation, and parent access in `tests/ZSLabs.Stride.App.Tests/Services/SubtaskServiceTests.cs` and `tests/ZSLabs.Stride.Api.Tests/Controllers/SubtasksControllerTests.cs`
+- [X] T018 [P] [US3] Add create-response tests for generated audit values, author username, empty comments, assignment validation, and parent access in `tests/ZSLabs.Stride.App.Tests/Services/SubtaskServiceTests.cs` and `tests/ZSLabs.Stride.Api.Tests/Controllers/SubtasksControllerTests.cs`
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Return created subtask data while refreshing board summaries from create operations in `src/ZSLabs.Stride.Web/src/hooks/useSubtask.ts` and `src/ZSLabs.Stride.Web/src/hooks/useTasks.ts`
-- [ ] T020 [US3] Add create mode, fixed parent context, disabled pre-save comment submission, save-to-edit transition, and generated read-only values in `src/ZSLabs.Stride.Web/src/components/SubtaskModal.tsx`
-- [ ] T021 [US3] Wire the task-dialog Add Subtask action to replace task state with subtask-create state in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx` and `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`
+- [X] T019 [US3] Return created subtask data while refreshing board summaries from create operations in `src/ZSLabs.Stride.Web/src/hooks/useSubtask.ts` and `src/ZSLabs.Stride.Web/src/hooks/useTasks.ts`
+- [X] T020 [US3] Add create mode, fixed parent context, disabled pre-save comment submission, save-to-edit transition, and generated read-only values in `src/ZSLabs.Stride.Web/src/components/SubtaskModal.tsx`
+- [X] T021 [US3] Wire the task-dialog Add Subtask action to replace task state with subtask-create state in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx` and `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`
 
 **Checkpoint**: A new subtask is created under the selected parent and remains open as a persisted subtask with refreshed summaries.
 
@@ -109,15 +109,15 @@
 
 ### Tests for User Story 4
 
-- [ ] T022 [P] [US4] Add service tests for chronological comment loading, author graph loading, owned mutation, non-author rejection, and current parent-space access revalidation in `tests/ZSLabs.Stride.App.Tests/Services/CommentServiceTests.cs`
-- [ ] T023 [P] [US4] Add controller tests for comment author username mappings and forbidden update/delete responses in `tests/ZSLabs.Stride.Api.Tests/Controllers/CommentsControllerTests.cs`
+- [X] T022 [P] [US4] Add service tests for chronological comment loading, author graph loading, owned mutation, non-author rejection, and current parent-space access revalidation in `tests/ZSLabs.Stride.App.Tests/Services/CommentServiceTests.cs`
+- [X] T023 [P] [US4] Add controller tests for comment author username mappings and forbidden update/delete responses in `tests/ZSLabs.Stride.Api.Tests/Controllers/CommentsControllerTests.cs`
 
 ### Implementation for User Story 4
 
-- [ ] T024 [US4] Load comment authors and revalidate ownership plus current parent-space access for comment mutations in `src/ZSLabs.Stride.App/Services/CommentService.cs`
-- [ ] T025 [US4] Return comment author usernames from create/update mappings in `src/ZSLabs.Stride.Api/Controllers/CommentsController.cs`
-- [ ] T026 [US4] Add comment create, update, delete, reordering, and retryable draft behavior in `src/ZSLabs.Stride.Web/src/hooks/useSubtask.ts`
-- [ ] T027 [US4] Render fields, chronological comment metadata and author-only controls, then new-comment controls in `src/ZSLabs.Stride.Web/src/components/SubtaskModal.tsx`
+- [X] T024 [US4] Load comment authors and revalidate ownership plus current parent-space access for comment mutations in `src/ZSLabs.Stride.App/Services/CommentService.cs`
+- [X] T025 [US4] Return comment author usernames from create/update mappings in `src/ZSLabs.Stride.Api/Controllers/CommentsController.cs`
+- [X] T026 [US4] Add comment create, update, delete, reordering, and retryable draft behavior in `src/ZSLabs.Stride.Web/src/hooks/useSubtask.ts`
+- [X] T027 [US4] Render fields, chronological comment metadata and author-only controls, then new-comment controls in `src/ZSLabs.Stride.Web/src/components/SubtaskModal.tsx`
 
 **Checkpoint**: The discussion remains earliest-to-latest after every mutation and both UI and API enforce author-only changes.
 
@@ -131,8 +131,8 @@
 
 ### Implementation for User Story 5
 
-- [ ] T028 [P] [US5] Add the clearly labeled parent-task navigation control to `src/ZSLabs.Stride.Web/src/components/SubtaskModal.tsx`
-- [ ] T029 [US5] Refresh tasks and replace subtask state with the matching parent-task state in `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`
+- [X] T028 [P] [US5] Add the clearly labeled parent-task navigation control to `src/ZSLabs.Stride.Web/src/components/SubtaskModal.tsx`
+- [X] T029 [US5] Refresh tasks and replace subtask state with the matching parent-task state in `src/ZSLabs.Stride.Web/src/pages/SpaceBoard.tsx`
 
 **Checkpoint**: Parent navigation never stacks dialogs and does not require a board search.
 
@@ -146,10 +146,8 @@
 
 ### Implementation for User Story 6
 
-- [ ] T030 [US6] Extract and apply one responsive modal shell with shared backdrop, outer geometry, header, and scroll-region behavior in `src/ZSLabs.Stride.Web/src/components/ModalShell.tsx`, `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`, and `src/ZSLabs.Stride.Web/src/components/SubtaskModal.tsx`
-- [ ] T031 [US6] Verify and correct shared mobile/desktop geometry, touch targets, focus visibility, overflow, and overlap in a browser using `specs/003-subtask-modal-dialog/quickstart.md` and `src/ZSLabs.Stride.Web/src/index.css`
-
-**Checkpoint**: Modal boundaries match at both representative widths and all content remains reachable.
+- [X] T030 [US6] Extract and apply one responsive modal shell with shared backdrop, outer geometry, header, and scroll-region behavior in `src/ZSLabs.Stride.Web/src/components/ModalShell.tsx`, `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`, and `src/ZSLabs.Stride.Web/src/components/SubtaskModal.tsx`
+- [X] T031 [US6] Verify and correct shared mobile/desktop geometry, touch targets, focus visibility, overflow, and overlap in a browser using `specs/003-subtask-modal-dialog/quickstart.md` and `src/ZSLabs.Stride.Web/src/index.css`
 
 ---
 
@@ -157,11 +155,11 @@
 
 **Purpose**: Remove superseded implementation, run every quality gate, and verify the completed frontend in real browsers as extensively as the environment permits.
 
-- [ ] T032 Remove all unused backend and frontend code after implementation, including obsolete embedded-subtask drafts/handlers in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`, superseded bulk-subtask orchestration in `src/ZSLabs.Stride.Web/src/hooks/useTasks.ts`, and any unused C# code/usings, TypeScript imports, dependencies, resources, migrations, files, or packages across `src/`, `tests/`, and `src/ZSLabs.Stride.Web/package.json`
-- [ ] T033 Run all .NET tests with `coverage.runsettings` against `Stride.sln`, fix feature regressions in `src/` and `tests/`, and confirm aggregate unit-test line coverage remains at least 80 percent
-- [ ] T034 Run ESLint and the strict production TypeScript build from `src/ZSLabs.Stride.Web/package.json`, fixing feature-related lint, type, and bundle failures in `src/ZSLabs.Stride.Web/src/`
-- [ ] T035 Verify the completed frontend in browsers as extensively as possible by executing every scenario in `specs/003-subtask-modal-dialog/quickstart.md` at minimum `390x844` and `1440x900`, covering pointer, keyboard, touch-sized controls, modal replacement, create/update/delete, comments, ordering, failures, and current Chrome/Edge/Firefox/Safari where available
-- [ ] T036 Parse `specs/003-subtask-modal-dialog/contracts/openapi.yaml`, run whitespace validation across `src/`, `tests/`, and `specs/003-subtask-modal-dialog/tasks.md`, and confirm no unplanned dependency, resource, migration, or generated-file changes remain
+- [X] T032 Remove all unused backend and frontend code after implementation, including obsolete embedded-subtask drafts/handlers in `src/ZSLabs.Stride.Web/src/components/TaskModal.tsx`, superseded bulk-subtask orchestration in `src/ZSLabs.Stride.Web/src/hooks/useTasks.ts`, and any unused C# code/usings, TypeScript imports, dependencies, resources, migrations, files, or packages across `src/`, `tests/`, and `src/ZSLabs.Stride.Web/package.json`
+- [X] T033 Run all .NET tests with `coverage.runsettings` against `Stride.sln`, fix feature regressions in `src/` and `tests/`, and confirm aggregate unit-test line coverage remains at least 80 percent
+- [X] T034 Run ESLint and the strict production TypeScript build from `src/ZSLabs.Stride.Web/package.json`, fixing feature-related lint, type, and bundle failures in `src/ZSLabs.Stride.Web/src/`
+- [X] T035 Verify the completed frontend in browsers as extensively as possible by executing every scenario in `specs/003-subtask-modal-dialog/quickstart.md` at minimum `390x844` and `1440x900`, covering pointer, keyboard, touch-sized controls, modal replacement, create/update/delete, comments, ordering, failures, and current Chrome/Edge/Firefox/Safari where available
+- [X] T036 Parse `specs/003-subtask-modal-dialog/contracts/openapi.yaml`, run whitespace validation across `src/`, `tests/`, and `specs/003-subtask-modal-dialog/tasks.md`, and confirm no unplanned dependency, resource, migration, or generated-file changes remain
 
 ---
 

@@ -1,6 +1,6 @@
 import { DndContext, PointerSensor, closestCorners, useSensor, useSensors } from '@dnd-kit/core'
 import type { DragEndEvent } from '@dnd-kit/core'
-import type { Task, TaskStatus } from '../api/contracts'
+import type { Subtask, Task, TaskStatus } from '../api/contracts'
 import { Column } from './Column'
 
 interface BoardProps {
@@ -8,6 +8,7 @@ interface BoardProps {
   onStatusChange: (taskId: number, status: TaskStatus) => Promise<void>
   onDeleteTask: (taskId: number) => Promise<void>
   onSelectTask: (task: Task) => void
+  onSelectSubtask: (subtask: Subtask) => void
 }
 
 const columns: Array<{ status: TaskStatus; title: string }> = [
@@ -23,6 +24,7 @@ export function Board({
   onStatusChange,
   onDeleteTask,
   onSelectTask,
+  onSelectSubtask,
 }: BoardProps) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
@@ -49,6 +51,7 @@ export function Board({
             tasks={tasks.filter((task) => task.status === column.status)}
             onDeleteTask={onDeleteTask}
             onSelectTask={onSelectTask}
+            onSelectSubtask={onSelectSubtask}
           />
         ))}
       </div>

@@ -14,7 +14,9 @@
             "approve": true,
             "matchCommandLine": true
         },
-        "&": true
+        "dotnet restore": true,
+        "npm run build": true,
+        "npm run dev": true
     }
 }
 

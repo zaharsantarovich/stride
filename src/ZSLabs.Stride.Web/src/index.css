@@ -25,3 +25,9 @@ body {
   margin: 0;
   font-family: var(--font-sans);
 }
+
+@media (max-width: 767px) {
+  [role="dialog"] button {
+    min-height: 44px;
+  }
+}

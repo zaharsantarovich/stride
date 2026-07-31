@@ -20,6 +20,24 @@ public sealed class SubtasksController : ControllerBase
         _subtaskService = subtaskService;
     }
 
+    [HttpGet("subtasks/{id:int}")]
+    public async Task<ActionResult<Subtask>> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var subtask = await _subtaskService.GetSubtaskAsync(id, GetCurrentUserId(), cancellationToken);
+            return Ok(Map(subtask));
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse(exception.Message));
+        }
+    }
+
     [HttpPost("tasks/{taskId:int}/subtasks")]
     public async Task<ActionResult<Subtask>> CreateAsync(int taskId, [FromBody] CreateSubtaskRequest request, CancellationToken cancellationToken)
     {
@@ -111,6 +129,7 @@ public sealed class SubtasksController : ControllerBase
             subtask.Description,
             (Contracts.SubtaskStatus)subtask.Status,
             subtask.AuthorId,
+            subtask.Author?.Username ?? throw new InvalidOperationException("Subtask author was not loaded."),
             subtask.AssigneeId,
             subtask.Assignee?.Username,
             subtask.DueDate,
@@ -121,6 +140,14 @@ public sealed class SubtasksController : ControllerBase
 
     private static Comment Map(DomainComment comment)
     {
-        return new Comment(comment.Id, comment.TaskId, comment.SubtaskId, comment.AuthorId, comment.Content, comment.CreatedAt, comment.UpdatedAt);
+        return new Comment(
+            comment.Id,
+            comment.TaskId,
+            comment.SubtaskId,
+            comment.AuthorId,
+            comment.Author?.Username ?? throw new InvalidOperationException("Comment author was not loaded."),
+            comment.Content,
+            comment.CreatedAt,
+            comment.UpdatedAt);
     }
 }

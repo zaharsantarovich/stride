@@ -4,21 +4,23 @@ import type { CreateTaskRequest, RegularUserLookup, Space, Task, UpdateTaskReque
 import { getSpace } from '../api/spaces'
 import { getRegularUsers } from '../api/users'
 import { Board } from '../components/Board'
+import { SubtaskModal } from '../components/SubtaskModal'
 import { TaskModal } from '../components/TaskModal'
 import { useAuth } from '../hooks/useAuth'
-import type { SubtaskDraftSave } from '../hooks/useTasks'
 import { useTasks } from '../hooks/useTasks'
 
 type ModalState =
-  | { mode: 'create'; task: null }
-  | { mode: 'edit'; task: Task }
+  | { kind: 'task-create' }
+  | { kind: 'task-edit'; task: Task }
+  | { kind: 'subtask-create'; parentTaskId: number }
+  | { kind: 'subtask-edit'; subtaskId: number; parentTaskId: number; launchSurface: 'board' | 'task' }
 
 export function SpaceBoardPage() {
   const navigate = useNavigate()
   const { spaceId } = useParams()
   const parsedSpaceId = Number(spaceId)
   const { currentUser, logout } = useAuth()
-  const { tasks, isLoading, errorMessage, addTaskWithSubtasks, saveTaskWithSubtasks, moveTask, removeTask, refreshTasks } = useTasks(parsedSpaceId)
+  const { tasks, isLoading, errorMessage, addTask, saveTask, moveTask, removeTask, refreshTasks } = useTasks(parsedSpaceId)
   const [space, setSpace] = useState<Space | null>(null)
   const [regularUsers, setRegularUsers] = useState<RegularUserLookup[]>([])
   const [pageError, setPageError] = useState<string | null>(null)
@@ -75,20 +77,37 @@ export function SpaceBoardPage() {
     }
   }, [currentUser?.role])
 
-  async function handleModalSave(taskRequest: CreateTaskRequest | UpdateTaskRequest, subtasks: SubtaskDraftSave[]) {
-    if (modalState?.mode === 'edit') {
-      await saveTaskWithSubtasks(modalState.task.id, taskRequest as UpdateTaskRequest, subtasks)
+  async function handleModalSave(taskRequest: CreateTaskRequest | UpdateTaskRequest) {
+    if (modalState?.kind === 'task-edit') {
+      await saveTask(modalState.task.id, taskRequest as UpdateTaskRequest)
       setModalState(null)
       return
     }
 
-    await addTaskWithSubtasks(taskRequest as CreateTaskRequest, subtasks)
+    await addTask(taskRequest as CreateTaskRequest)
     setModalState(null)
   }
 
   async function handleSignOut() {
     await logout()
     navigate('/sign-in', { replace: true })
+  }
+
+  async function openParentTask(parentTaskId: number) {
+    try {
+      const refreshedTasks = await refreshTasks()
+      const parentTask = refreshedTasks.find((task) => task.id === parentTaskId)
+
+      if (parentTask === undefined) {
+        setPageError('Parent task is no longer available.')
+        setModalState(null)
+        return
+      }
+
+      setModalState({ kind: 'task-edit', task: parentTask })
+    } catch (error) {
+      setPageError(error instanceof Error ? error.message : 'Unable to open the parent task.')
+    }
   }
 
   if (Number.isNaN(parsedSpaceId)) {
@@ -113,7 +132,7 @@ export function SpaceBoardPage() {
             <button className="rounded-xl border border-stride-border bg-white px-4 py-2 text-sm font-semibold text-stride-ink" onClick={() => void refreshTasks()} type="button">
               Refresh board
             </button>
-            <button className="rounded-xl bg-stride-accent px-4 py-2 text-sm font-semibold text-white" onClick={() => setModalState({ mode: 'create', task: null })} type="button">
+            <button className="rounded-xl bg-stride-accent px-4 py-2 text-sm font-semibold text-white" onClick={() => setModalState({ kind: 'task-create' })} type="button">
               Create Task
             </button>
             <button className="rounded-xl border border-stride-border bg-white px-4 py-2 text-sm font-semibold text-stride-ink" onClick={() => void handleSignOut()} type="button">
@@ -137,19 +156,45 @@ export function SpaceBoardPage() {
             tasks={tasks}
             onStatusChange={moveTask}
             onDeleteTask={removeTask}
-            onSelectTask={(task) => setModalState({ mode: 'edit', task })}
+            onSelectTask={(task) => setModalState({ kind: 'task-edit', task })}
+            onSelectSubtask={(subtask) => setModalState({ kind: 'subtask-edit', subtaskId: subtask.id, parentTaskId: subtask.taskId, launchSurface: 'board' })}
           />
         </div>
-        {modalState !== null && space !== null && currentUser !== null ? (
+        {modalState !== null && (modalState.kind === 'task-create' || modalState.kind === 'task-edit') && space !== null && currentUser !== null ? (
           <TaskModal
-            mode={modalState.mode}
-            task={modalState.task}
+            mode={modalState.kind === 'task-create' ? 'create' : 'edit'}
+            task={modalState.kind === 'task-create' ? null : modalState.task}
             space={space}
             currentUser={{ id: currentUser.id, username: currentUser.username }}
             regularUsers={regularUsers}
             errorMessage={errorMessage}
             onDismiss={() => setModalState(null)}
             onSave={handleModalSave}
+            onSelectSubtask={(subtask) => setModalState({ kind: 'subtask-edit', subtaskId: subtask.id, parentTaskId: subtask.taskId, launchSurface: 'task' })}
+            onAddSubtask={() => {
+              if (modalState.kind === 'task-edit') {
+                setModalState({ kind: 'subtask-create', parentTaskId: modalState.task.id })
+              }
+            }}
+          />
+        ) : null}
+        {(modalState?.kind === 'subtask-edit' || modalState?.kind === 'subtask-create') && space !== null && currentUser !== null ? (
+          <SubtaskModal
+            subtaskId={modalState.kind === 'subtask-edit' ? modalState.subtaskId : null}
+            parentTaskId={modalState.parentTaskId}
+            space={space}
+            currentUser={{ id: currentUser.id, username: currentUser.username }}
+            regularUsers={regularUsers}
+            onDismiss={() => setModalState(null)}
+            onDeleted={() => {
+              if (modalState.kind === 'subtask-edit' && modalState.launchSurface === 'board') {
+                setModalState(null)
+              } else {
+                void openParentTask(modalState.parentTaskId)
+              }
+            }}
+            onOpenParent={() => void openParentTask(modalState.parentTaskId)}
+            onRefreshTasks={refreshTasks}
           />
         ) : null}
       </section>

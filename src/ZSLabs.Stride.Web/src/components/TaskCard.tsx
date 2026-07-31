@@ -1,15 +1,16 @@
 import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
-import type { KeyboardEvent, MouseEvent } from 'react'
-import type { Task } from '../api/contracts'
+import type { KeyboardEvent, MouseEvent, PointerEvent } from 'react'
+import type { Subtask, Task } from '../api/contracts'
 
 interface TaskCardProps {
   task: Task
   onDelete: (taskId: number) => Promise<void>
   onSelect: (task: Task) => void
+  onSelectSubtask: (subtask: Subtask) => void
 }
 
-export function TaskCard({ task, onDelete, onSelect }: TaskCardProps) {
+export function TaskCard({ task, onDelete, onSelect, onSelectSubtask }: TaskCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: `task-${task.id}`,
     data: {
@@ -28,6 +29,14 @@ export function TaskCard({ task, onDelete, onSelect }: TaskCardProps) {
   function stopCardSelection(event: MouseEvent<HTMLButtonElement>) {
     event.stopPropagation()
   }
+
+  function stopCardPointer(event: PointerEvent<HTMLAnchorElement>) {
+    event.stopPropagation()
+  }
+
+  const orderedSubtasks = [...task.subtasks].sort(
+    (left, right) => new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime(),
+  )
 
   return (
     <article
@@ -69,16 +78,23 @@ export function TaskCard({ task, onDelete, onSelect }: TaskCardProps) {
       <div className="mt-4 grid gap-2 text-xs text-stride-muted">
         <p>Assigned: {task.assigneeUsername ?? 'Unassigned'}</p>
       </div>
-      {task.subtasks.length > 0 ? (
+      {orderedSubtasks.length > 0 && (
         <ul className="mt-4 grid gap-1.5 text-sm text-stride-ink">
-          {task.subtasks.map((subtask) => (
+          {orderedSubtasks.map((subtask) => (
             <li key={subtask.id} className="break-words rounded-lg bg-stride-surface px-3 py-2">
-              {subtask.title}
+              <a
+                aria-label={`Open subtask ${subtask.title} from task ${task.title}`}
+                className="font-semibold text-stride-accent underline decoration-1 underline-offset-4 focus:outline-none focus:ring-2 focus:ring-stride-accent"
+                href={`/spaces/${task.spaceId}?subtask=${subtask.id}`}
+                onClick={(event) => { event.preventDefault(); event.stopPropagation(); onSelectSubtask(subtask) }}
+                onKeyDown={(event) => event.stopPropagation()}
+                onPointerDown={stopCardPointer}
+              >
+                {subtask.title}
+              </a>
             </li>
           ))}
         </ul>
-      ) : (
-        <p className="mt-4 text-sm text-stride-muted">No subtasks</p>
       )}
     </article>
   )

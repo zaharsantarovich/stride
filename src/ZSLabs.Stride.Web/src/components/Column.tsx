@@ -1,5 +1,5 @@
 import { useDroppable } from '@dnd-kit/core'
-import type { Task, TaskStatus } from '../api/contracts'
+import type { Subtask, Task, TaskStatus } from '../api/contracts'
 import { TaskCard } from './TaskCard'
 
 interface ColumnProps {
@@ -8,6 +8,7 @@ interface ColumnProps {
   tasks: Task[]
   onDeleteTask: (taskId: number) => Promise<void>
   onSelectTask: (task: Task) => void
+  onSelectSubtask: (subtask: Subtask) => void
 }
 
 export function Column({
@@ -16,6 +17,7 @@ export function Column({
   tasks,
   onDeleteTask,
   onSelectTask,
+  onSelectSubtask,
 }: ColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: `column-${status}`,
@@ -40,6 +42,7 @@ export function Column({
             task={task}
             onDelete={onDeleteTask}
             onSelect={onSelectTask}
+            onSelectSubtask={onSelectSubtask}
           />
         ))}
         {tasks.length === 0 ? <p className="rounded-2xl border border-dashed border-stride-border px-4 py-8 text-sm text-stride-muted">Drop a task here or create one from the board header.</p> : null}

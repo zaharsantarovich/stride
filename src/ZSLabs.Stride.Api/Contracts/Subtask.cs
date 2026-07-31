@@ -7,6 +7,7 @@ public sealed record Subtask(
     string? Description,
     SubtaskStatus Status,
     int AuthorId,
+    string AuthorUsername,
     int? AssigneeId,
     string? AssigneeUsername,
     DateTime? DueDate,

@@ -170,6 +170,7 @@ public sealed class TasksController : ControllerBase
             subtask.Description,
             (Contracts.SubtaskStatus)subtask.Status,
             subtask.AuthorId,
+            subtask.Author?.Username ?? throw new InvalidOperationException("Subtask author was not loaded."),
             subtask.AssigneeId,
             subtask.Assignee?.Username,
             subtask.DueDate,
@@ -180,6 +181,14 @@ public sealed class TasksController : ControllerBase
 
     private static Contracts.Comment Map(DomainComment comment)
     {
-        return new Contracts.Comment(comment.Id, comment.TaskId, comment.SubtaskId, comment.AuthorId, comment.Content, comment.CreatedAt, comment.UpdatedAt);
+        return new Contracts.Comment(
+            comment.Id,
+            comment.TaskId,
+            comment.SubtaskId,
+            comment.AuthorId,
+            comment.Author?.Username ?? throw new InvalidOperationException("Comment author was not loaded."),
+            comment.Content,
+            comment.CreatedAt,
+            comment.UpdatedAt);
     }
 }

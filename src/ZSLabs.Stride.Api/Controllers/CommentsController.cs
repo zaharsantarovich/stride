@@ -91,6 +91,14 @@ public sealed class CommentsController : ControllerBase
 
     private static Comment Map(DomainComment comment)
     {
-        return new Comment(comment.Id, comment.TaskId, comment.SubtaskId, comment.AuthorId, comment.Content, comment.CreatedAt, comment.UpdatedAt);
+        return new Comment(
+            comment.Id,
+            comment.TaskId,
+            comment.SubtaskId,
+            comment.AuthorId,
+            comment.Author?.Username ?? throw new InvalidOperationException("Comment author was not loaded."),
+            comment.Content,
+            comment.CreatedAt,
+            comment.UpdatedAt);
     }
 }

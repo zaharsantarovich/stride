@@ -5,6 +5,8 @@ namespace ZSLabs.Stride.App.Services;
 
 public interface ISubtaskService
 {
+    Task<Subtask> GetSubtaskAsync(int subtaskId, int actorId, CancellationToken cancellationToken);
+
     Task<Subtask> CreateSubtaskAsync(
         int taskId,
         int actorId,

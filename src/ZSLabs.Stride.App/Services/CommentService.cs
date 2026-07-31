@@ -20,7 +20,7 @@ public class CommentService : ICommentService
         var space = await FindSpaceAsync(task.SpaceId, cancellationToken);
         EnsureCanAccessSpace(space, actorId);
 
-        return await _dbContext.Comments
+        return await QueryComments()
             .Where(comment => comment.TaskId == taskId)
             .OrderBy(comment => comment.CreatedAt)
             .ToListAsync(cancellationToken);
@@ -33,7 +33,7 @@ public class CommentService : ICommentService
         var space = await FindSpaceAsync(task.SpaceId, cancellationToken);
         EnsureCanAccessSpace(space, actorId);
 
-        return await _dbContext.Comments
+        return await QueryComments()
             .Where(comment => comment.SubtaskId == subtaskId)
             .OrderBy(comment => comment.CreatedAt)
             .ToListAsync(cancellationToken);
@@ -49,7 +49,7 @@ public class CommentService : ICommentService
         _dbContext.Comments.Add(comment);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return comment;
+        return await FindCommentAsync(comment.Id, cancellationToken);
     }
 
     public async Task<Comment> CreateSubtaskCommentAsync(int subtaskId, int actorId, string content, CancellationToken cancellationToken)
@@ -63,13 +63,14 @@ public class CommentService : ICommentService
         _dbContext.Comments.Add(comment);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return comment;
+        return await FindCommentAsync(comment.Id, cancellationToken);
     }
 
     public async Task<Comment> UpdateCommentAsync(int commentId, int actorId, string content, CancellationToken cancellationToken)
     {
         var comment = await FindCommentAsync(commentId, cancellationToken);
         EnsureIsAuthor(comment, actorId);
+        await EnsureCanAccessCommentParentAsync(comment, actorId, cancellationToken);
 
         comment.Content = content;
         comment.UpdatedAt = DateTime.UtcNow;
@@ -82,6 +83,7 @@ public class CommentService : ICommentService
     {
         var comment = await FindCommentAsync(commentId, cancellationToken);
         EnsureIsAuthor(comment, actorId);
+        await EnsureCanAccessCommentParentAsync(comment, actorId, cancellationToken);
 
         _dbContext.Comments.Remove(comment);
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -110,9 +112,39 @@ public class CommentService : ICommentService
 
     private async Task<Comment> FindCommentAsync(int commentId, CancellationToken cancellationToken)
     {
-        return await _dbContext.Comments
+        return await QueryComments()
             .SingleOrDefaultAsync(comment => comment.Id == commentId, cancellationToken)
             ?? throw new KeyNotFoundException("Comment not found.");
+    }
+
+    private IQueryable<Comment> QueryComments()
+    {
+        return _dbContext.Comments.Include(comment => comment.Author);
+    }
+
+    private async global::System.Threading.Tasks.Task EnsureCanAccessCommentParentAsync(
+        Comment comment,
+        int actorId,
+        CancellationToken cancellationToken)
+    {
+        TaskEntity task;
+
+        if (comment.TaskId.HasValue)
+        {
+            task = await FindTaskAsync(comment.TaskId.Value, cancellationToken);
+        }
+        else if (comment.SubtaskId.HasValue)
+        {
+            var subtask = await FindSubtaskAsync(comment.SubtaskId.Value, cancellationToken);
+            task = await FindTaskAsync(subtask.TaskId, cancellationToken);
+        }
+        else
+        {
+            throw new KeyNotFoundException("Comment parent not found.");
+        }
+
+        var space = await FindSpaceAsync(task.SpaceId, cancellationToken);
+        EnsureCanAccessSpace(space, actorId);
     }
 
     private static void EnsureCanAccessSpace(Space space, int actorId)
