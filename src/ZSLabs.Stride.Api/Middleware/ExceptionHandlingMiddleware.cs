@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using ZSLabs.Stride.Api.Contracts;
+using Task = System.Threading.Tasks.Task;
 
 namespace ZSLabs.Stride.Api.Middleware;
 
@@ -16,7 +17,7 @@ public sealed class ExceptionHandlingMiddleware
         _logger = logger;
     }
 
-    public async global::System.Threading.Tasks.Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
     {
         try
         {

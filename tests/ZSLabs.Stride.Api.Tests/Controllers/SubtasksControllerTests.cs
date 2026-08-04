@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using ZSLabs.Stride.Api.Contracts;
+using Task = System.Threading.Tasks.Task;
 using ZSLabs.Stride.Api.Controllers;
 using ZSLabs.Stride.App.Services;
 using DomainComment = ZSLabs.Stride.Domain.Entities.Comment;
@@ -18,7 +19,7 @@ namespace ZSLabs.Stride.Api.Tests.Controllers;
 public class SubtasksControllerTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task GetAsync_ExistingSubtask_ReturnsCompleteMappedSubtask()
+    public async Task GetAsync_ExistingSubtask_ReturnsCompleteMappedSubtask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ISubtaskService>();
@@ -45,12 +46,12 @@ public class SubtasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetAsync_NoAccess_ReturnsForbidden()
+    public async Task GetAsync_NoAccess_ReturnsForbidden()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ISubtaskService>();
         service.GetSubtaskAsync(6, 8, cancellationToken)
-            .Returns(_ => global::System.Threading.Tasks.Task.FromException<DomainSubtask>(new UnauthorizedAccessException("No access.")));
+            .Returns(_ => Task.FromException<DomainSubtask>(new UnauthorizedAccessException("No access.")));
 
         var result = await CreateController(service, 8).GetAsync(6, cancellationToken);
 
@@ -59,12 +60,12 @@ public class SubtasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetAsync_MissingSubtask_ReturnsNotFound()
+    public async Task GetAsync_MissingSubtask_ReturnsNotFound()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ISubtaskService>();
         service.GetSubtaskAsync(6, 8, cancellationToken)
-            .Returns(_ => global::System.Threading.Tasks.Task.FromException<DomainSubtask>(new KeyNotFoundException()));
+            .Returns(_ => Task.FromException<DomainSubtask>(new KeyNotFoundException()));
 
         var result = await CreateController(service, 8).GetAsync(6, cancellationToken);
 
@@ -81,7 +82,7 @@ public class SubtasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateAsync_ValidRequest_ReturnsCreatedSubtask()
+    public async Task CreateAsync_ValidRequest_ReturnsCreatedSubtask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ISubtaskService>();
@@ -103,12 +104,12 @@ public class SubtasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateAsync_NoAccess_ReturnsForbidden()
+    public async Task UpdateAsync_NoAccess_ReturnsForbidden()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ISubtaskService>();
         service.UpdateSubtaskAsync(6, 8, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<DomainSubtaskStatus?>(), Arg.Any<int?>(), Arg.Any<DateTime?>(), cancellationToken)
-            .Returns(_ => global::System.Threading.Tasks.Task.FromException<DomainSubtask>(new UnauthorizedAccessException("No access.")));
+            .Returns(_ => Task.FromException<DomainSubtask>(new UnauthorizedAccessException("No access.")));
 
         var controller = CreateController(service, 8);
         var result = await controller.UpdateAsync(6, new UpdateSubtaskRequest("Renamed", null, Contracts.SubtaskStatus.Done, null, null), cancellationToken);
@@ -118,7 +119,7 @@ public class SubtasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteAsync_ExistingSubtask_ReturnsNoContent()
+    public async Task DeleteAsync_ExistingSubtask_ReturnsNoContent()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ISubtaskService>();

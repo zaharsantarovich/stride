@@ -60,7 +60,7 @@ public class SpaceService : ISpaceService
         return space;
     }
 
-    public async global::System.Threading.Tasks.Task DeleteSpaceAsync(int spaceId, int actorId, CancellationToken cancellationToken)
+    public async Task DeleteSpaceAsync(int spaceId, int actorId, CancellationToken cancellationToken)
     {
         var space = await FindSpaceAsync(spaceId, cancellationToken);
         EnsureCanDelete(space, actorId);
@@ -76,7 +76,7 @@ public class SpaceService : ISpaceService
             ?? throw new KeyNotFoundException("Space not found.");
     }
 
-    private async global::System.Threading.Tasks.Task EnsureUniqueKeyAsync(string key, CancellationToken cancellationToken)
+    private async Task EnsureUniqueKeyAsync(string key, CancellationToken cancellationToken)
     {
         if (await _dbContext.Spaces.AnyAsync(space => space.Key == key, cancellationToken))
         {

@@ -1,7 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using TaskEntity = ZSLabs.Stride.Domain.Entities.Task;
-using TaskPriority = ZSLabs.Stride.Domain.Enums.TaskPriority;
+using ZSLabs.Stride.Domain.Enums;
 using TaskStatus = ZSLabs.Stride.Domain.Enums.TaskStatus;
 using SubtaskStatus = ZSLabs.Stride.Domain.Enums.SubtaskStatus;
 using UserRole = ZSLabs.Stride.Domain.Enums.UserRole;
@@ -13,7 +12,20 @@ namespace ZSLabs.Stride.Persistence.Tests;
 public class StrideDbContextTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task SpaceDelete_RelatedTasksSubtasksAndComments_CascadesDelete()
+    public void TaskItemMapping_UsesExistingTasksTable()
+    {
+        using var connection = new SqliteConnection("Data Source=:memory:");
+        using var context = CreateContext(connection);
+
+        var tableName = context.Model.FindEntityType(typeof(TaskItem))?.GetTableName();
+
+        Assert.Equal("Tasks", tableName);
+        Assert.NotEqual("TaskItem", tableName);
+        Assert.NotEqual("TaskItems", tableName);
+    }
+
+    [Fact]
+    public async Task SpaceDelete_RelatedTasksSubtasksAndComments_CascadesDelete()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
 
@@ -30,7 +42,7 @@ public class StrideDbContextTests
         context.Spaces.Add(space);
         await context.SaveChangesAsync(cancellationToken);
 
-        var task = new TaskEntity(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Medium, user.Id, null, null, DateTime.UtcNow);
+        var task = new TaskItem(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Medium, user.Id, null, null, DateTime.UtcNow);
         context.Tasks.Add(task);
         await context.SaveChangesAsync(cancellationToken);
 
@@ -53,7 +65,7 @@ public class StrideDbContextTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DatabaseConstraints_UsernameAndSpaceKey_EnforcesUniqueness()
+    public async Task DatabaseConstraints_UsernameAndSpaceKey_EnforcesUniqueness()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
 
@@ -81,7 +93,7 @@ public class StrideDbContextTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DateTimeMaterialization_StoredDateTimes_TagsAsUtc()
+    public async Task DateTimeMaterialization_StoredDateTimes_TagsAsUtc()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
 

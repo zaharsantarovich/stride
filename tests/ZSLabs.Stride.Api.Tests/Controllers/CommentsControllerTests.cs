@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using ZSLabs.Stride.Api.Contracts;
+using Task = System.Threading.Tasks.Task;
 using ZSLabs.Stride.Api.Controllers;
 using ZSLabs.Stride.App.Services;
 using DomainComment = ZSLabs.Stride.Domain.Entities.Comment;
@@ -25,7 +26,7 @@ public class CommentsControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskCommentAsync_ValidRequest_ReturnsCreatedComment()
+    public async Task CreateTaskCommentAsync_ValidRequest_ReturnsCreatedComment()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ICommentService>();
@@ -41,7 +42,7 @@ public class CommentsControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateAsync_OwnedComment_ReturnsMappedAuthorUsername()
+    public async Task UpdateAsync_OwnedComment_ReturnsMappedAuthorUsername()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ICommentService>();
@@ -56,12 +57,12 @@ public class CommentsControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateAsync_ActorNotAuthor_ReturnsForbidden()
+    public async Task UpdateAsync_ActorNotAuthor_ReturnsForbidden()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ICommentService>();
         service.UpdateCommentAsync(9, 8, "Updated", cancellationToken)
-            .Returns(_ => global::System.Threading.Tasks.Task.FromException<DomainComment>(new UnauthorizedAccessException("Only the author can modify this comment.")));
+            .Returns(_ => Task.FromException<DomainComment>(new UnauthorizedAccessException("Only the author can modify this comment.")));
 
         var controller = CreateController(service, 8);
         var result = await controller.UpdateAsync(9, new CreateCommentRequest("Updated"), cancellationToken);
@@ -71,7 +72,7 @@ public class CommentsControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteAsync_ExistingComment_ReturnsNoContent()
+    public async Task DeleteAsync_ExistingComment_ReturnsNoContent()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ICommentService>();
@@ -83,12 +84,12 @@ public class CommentsControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteAsync_ActorNotAuthor_ReturnsForbidden()
+    public async Task DeleteAsync_ActorNotAuthor_ReturnsForbidden()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ICommentService>();
         service.DeleteCommentAsync(9, 8, cancellationToken)
-            .Returns(_ => global::System.Threading.Tasks.Task.FromException(new UnauthorizedAccessException("Only the author can modify this comment.")));
+            .Returns(_ => Task.FromException(new UnauthorizedAccessException("Only the author can modify this comment.")));
 
         var result = await CreateController(service, 8).DeleteAsync(9, cancellationToken);
 

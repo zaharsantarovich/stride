@@ -14,5 +14,5 @@ public interface ICommentService
 
     Task<Comment> UpdateCommentAsync(int commentId, int actorId, string content, CancellationToken cancellationToken);
 
-    global::System.Threading.Tasks.Task DeleteCommentAsync(int commentId, int actorId, CancellationToken cancellationToken);
+    Task DeleteCommentAsync(int commentId, int actorId, CancellationToken cancellationToken);
 }

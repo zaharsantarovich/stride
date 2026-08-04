@@ -2,8 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using ZSLabs.Stride.Domain.Entities;
 using ZSLabs.Stride.Domain.Enums;
 using ZSLabs.Stride.Persistence;
-using TaskEntity = ZSLabs.Stride.Domain.Entities.Task;
-using TaskPriority = ZSLabs.Stride.Domain.Enums.TaskPriority;
 using TaskStatus = ZSLabs.Stride.Domain.Enums.TaskStatus;
 
 namespace ZSLabs.Stride.App.Services;
@@ -17,7 +15,7 @@ public class TaskService : ITaskService
         _dbContext = dbContext;
     }
 
-    public async Task<IReadOnlyList<TaskEntity>> GetTasksAsync(int spaceId, int actorId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<TaskItem>> GetTasksAsync(int spaceId, int actorId, CancellationToken cancellationToken)
     {
         var space = await FindSpaceAsync(spaceId, cancellationToken);
         EnsureCanAccessSpace(space, actorId);
@@ -30,7 +28,7 @@ public class TaskService : ITaskService
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<TaskEntity> CreateTaskAsync(
+    public async Task<TaskItem> CreateTaskAsync(
         int spaceId,
         int actorId,
         string title,
@@ -45,7 +43,7 @@ public class TaskService : ITaskService
         EnsureCanAccessSpace(space, actorId);
         await EnsureAssigneeHasSpaceAccessAsync(space, assigneeId, cancellationToken);
 
-        var task = new TaskEntity(
+        var task = new TaskItem(
             spaceId,
             title,
             description,
@@ -62,7 +60,7 @@ public class TaskService : ITaskService
         return await LoadTaskGraphAsync(task.Id, cancellationToken);
     }
 
-    public async Task<TaskEntity> UpdateTaskAsync(
+    public async Task<TaskItem> UpdateTaskAsync(
         int taskId,
         int actorId,
         string? title,
@@ -103,7 +101,7 @@ public class TaskService : ITaskService
         return await LoadTaskGraphAsync(task.Id, cancellationToken);
     }
 
-    public async Task<TaskEntity> UpdateTaskStatusAsync(int taskId, int actorId, TaskStatus status, CancellationToken cancellationToken)
+    public async Task<TaskItem> UpdateTaskStatusAsync(int taskId, int actorId, TaskStatus status, CancellationToken cancellationToken)
     {
         var task = await FindTaskAsync(taskId, cancellationToken);
         var space = await FindSpaceAsync(task.SpaceId, cancellationToken);
@@ -116,7 +114,7 @@ public class TaskService : ITaskService
         return await LoadTaskGraphAsync(task.Id, cancellationToken);
     }
 
-    public async global::System.Threading.Tasks.Task DeleteTaskAsync(int taskId, int actorId, CancellationToken cancellationToken)
+    public async Task DeleteTaskAsync(int taskId, int actorId, CancellationToken cancellationToken)
     {
         var task = await FindTaskAsync(taskId, cancellationToken);
         var space = await FindSpaceAsync(task.SpaceId, cancellationToken);
@@ -126,7 +124,7 @@ public class TaskService : ITaskService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private IQueryable<TaskEntity> QueryTasks()
+    private IQueryable<TaskItem> QueryTasks()
     {
         return _dbContext.Tasks
             .Include(task => task.Assignee)
@@ -148,20 +146,20 @@ public class TaskService : ITaskService
             ?? throw new KeyNotFoundException("Space not found.");
     }
 
-    private async Task<TaskEntity> FindTaskAsync(int taskId, CancellationToken cancellationToken)
+    private async Task<TaskItem> FindTaskAsync(int taskId, CancellationToken cancellationToken)
     {
         return await _dbContext.Tasks
             .SingleOrDefaultAsync(task => task.Id == taskId, cancellationToken)
             ?? throw new KeyNotFoundException("Task not found.");
     }
 
-    private async Task<TaskEntity> LoadTaskGraphAsync(int taskId, CancellationToken cancellationToken)
+    private async Task<TaskItem> LoadTaskGraphAsync(int taskId, CancellationToken cancellationToken)
     {
         return await QueryTasks()
             .SingleAsync(task => task.Id == taskId, cancellationToken);
     }
 
-    private async global::System.Threading.Tasks.Task EnsureAssigneeHasSpaceAccessAsync(Space space, int? assigneeId, CancellationToken cancellationToken)
+    private async Task EnsureAssigneeHasSpaceAccessAsync(Space space, int? assigneeId, CancellationToken cancellationToken)
     {
         if (!assigneeId.HasValue)
         {

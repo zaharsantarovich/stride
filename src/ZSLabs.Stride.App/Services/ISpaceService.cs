@@ -12,5 +12,5 @@ public interface ISpaceService
 
     Task<Space> UpdateSpaceAsync(int spaceId, int actorId, string? name, bool? isPublic, CancellationToken cancellationToken);
 
-    global::System.Threading.Tasks.Task DeleteSpaceAsync(int spaceId, int actorId, CancellationToken cancellationToken);
+    Task DeleteSpaceAsync(int spaceId, int actorId, CancellationToken cancellationToken);
 }

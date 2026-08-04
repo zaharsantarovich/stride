@@ -7,9 +7,10 @@ using NSubstitute;
 using ZSLabs.Stride.Api.Contracts;
 using ZSLabs.Stride.Api.Controllers;
 using ZSLabs.Stride.App.Services;
-using DomainTask = ZSLabs.Stride.Domain.Entities.Task;
-using DomainTaskPriority = ZSLabs.Stride.Domain.Enums.TaskPriority;
-using DomainTaskStatus = ZSLabs.Stride.Domain.Enums.TaskStatus;
+using ZSLabs.Stride.Domain.Entities;
+using TaskPriorityEnum = ZSLabs.Stride.Domain.Enums.TaskPriority;
+using TaskStatusEnum = ZSLabs.Stride.Domain.Enums.TaskStatus;
+using Task = System.Threading.Tasks.Task;
 
 namespace ZSLabs.Stride.Api.Tests.Controllers;
 
@@ -25,12 +26,12 @@ public class TasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetAsync_ValidSpaceAndUser_ReturnsTasks()
+    public async Task GetAsync_ValidSpaceAndUser_ReturnsTasks()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ITaskService>();
         service.GetTasksAsync(3, 8, cancellationToken).Returns([
-            new DomainTask(3, "Task", null, DomainTaskStatus.Backlog, DomainTaskPriority.High, 8, null, null, DateTime.UtcNow),
+            new TaskItem(3, "Task", null, TaskStatusEnum.Backlog, TaskPriorityEnum.High, 8, null, null, DateTime.UtcNow),
         ]);
 
         var controller = CreateController(service, 8);
@@ -42,12 +43,12 @@ public class TasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateAsync_NoSpaceAccess_ReturnsForbidden()
+    public async Task CreateAsync_NoSpaceAccess_ReturnsForbidden()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ITaskService>();
-        service.CreateTaskAsync(3, 8, Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<DomainTaskStatus?>(), Arg.Any<DomainTaskPriority>(), Arg.Any<int?>(), Arg.Any<DateTime?>(), cancellationToken)
-            .Returns(_ => global::System.Threading.Tasks.Task.FromException<DomainTask>(new UnauthorizedAccessException("No access.")));
+        service.CreateTaskAsync(3, 8, Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<TaskStatusEnum?>(), Arg.Any<TaskPriorityEnum>(), Arg.Any<int?>(), Arg.Any<DateTime?>(), cancellationToken)
+            .Returns(_ => Task.FromException<TaskItem>(new UnauthorizedAccessException("No access.")));
 
         var controller = CreateController(service, 8);
         var result = await controller.CreateAsync(3, new CreateTaskRequest("Task", null, null, Contracts.TaskPriority.High, null, null), cancellationToken);
@@ -57,12 +58,12 @@ public class TasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateStatusAsync_ValidStatus_ReturnsUpdatedTask()
+    public async Task UpdateStatusAsync_ValidStatus_ReturnsUpdatedTask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ITaskService>();
-        service.UpdateTaskStatusAsync(11, 8, DomainTaskStatus.Done, cancellationToken)
-            .Returns(new DomainTask(3, "Task", null, DomainTaskStatus.Done, DomainTaskPriority.Medium, 8, null, null, DateTime.UtcNow));
+        service.UpdateTaskStatusAsync(11, 8, TaskStatusEnum.Done, cancellationToken)
+            .Returns(new TaskItem(3, "Task", null, TaskStatusEnum.Done, TaskPriorityEnum.Medium, 8, null, null, DateTime.UtcNow));
 
         var controller = CreateController(service, 8);
         var result = await controller.UpdateStatusAsync(11, new UpdateTaskStatusRequest(Contracts.TaskStatus.Done), cancellationToken);
@@ -73,7 +74,7 @@ public class TasksControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteAsync_ExistingTask_ReturnsNoContent()
+    public async Task DeleteAsync_ExistingTask_ReturnsNoContent()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var service = Substitute.For<ITaskService>();

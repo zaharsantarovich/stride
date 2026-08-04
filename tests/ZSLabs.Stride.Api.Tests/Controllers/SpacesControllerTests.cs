@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using ZSLabs.Stride.Api.Contracts;
+using Task = System.Threading.Tasks.Task;
 using ZSLabs.Stride.Api.Controllers;
 using ZSLabs.Stride.App.Services;
 using ZSLabs.Stride.Domain.Entities;
@@ -24,12 +25,12 @@ public class SpacesControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetByIdAsync_PrivateSpaceNoAccess_ReturnsForbidden()
+    public async Task GetByIdAsync_PrivateSpaceNoAccess_ReturnsForbidden()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var spaceService = Substitute.For<ISpaceService>();
         spaceService.GetSpaceAsync(5, 8, cancellationToken)
-            .Returns(_ => global::System.Threading.Tasks.Task.FromException<DomainSpace>(new UnauthorizedAccessException("No access.")));
+            .Returns(_ => Task.FromException<DomainSpace>(new UnauthorizedAccessException("No access.")));
 
         var controller = CreateController(spaceService, 8);
 
@@ -40,12 +41,12 @@ public class SpacesControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateAsync_DuplicateKey_ReturnsConflict()
+    public async Task CreateAsync_DuplicateKey_ReturnsConflict()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var spaceService = Substitute.For<ISpaceService>();
         spaceService.CreateSpaceAsync(8, "dup", "Name", true, cancellationToken)
-            .Returns(_ => global::System.Threading.Tasks.Task.FromException<DomainSpace>(new InvalidOperationException("Space key already exists.")));
+            .Returns(_ => Task.FromException<DomainSpace>(new InvalidOperationException("Space key already exists.")));
 
         var controller = CreateController(spaceService, 8);
 
@@ -55,12 +56,12 @@ public class SpacesControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateAsync_NonAuthorVisibilityChange_ReturnsForbidden()
+    public async Task UpdateAsync_NonAuthorVisibilityChange_ReturnsForbidden()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var spaceService = Substitute.For<ISpaceService>();
         spaceService.UpdateSpaceAsync(4, 8, "Name", false, cancellationToken)
-            .Returns(_ => global::System.Threading.Tasks.Task.FromException<DomainSpace>(new UnauthorizedAccessException("Only the author can change space visibility.")));
+            .Returns(_ => Task.FromException<DomainSpace>(new UnauthorizedAccessException("Only the author can change space visibility.")));
 
         var controller = CreateController(spaceService, 8);
 

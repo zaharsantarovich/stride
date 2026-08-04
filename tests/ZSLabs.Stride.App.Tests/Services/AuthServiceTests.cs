@@ -10,7 +10,7 @@ namespace ZSLabs.Stride.App.Tests.Services;
 public class AuthServiceTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task AuthenticateAsync_ValidCredentials_ReturnsUser()
+    public async Task AuthenticateAsync_ValidCredentials_ReturnsUser()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -33,7 +33,7 @@ public class AuthServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task AuthenticateAsync_InvalidCredentials_ReturnsNull()
+    public async Task AuthenticateAsync_InvalidCredentials_ReturnsNull()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");

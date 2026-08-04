@@ -1,4 +1,4 @@
-using TaskPriority = ZSLabs.Stride.Domain.Enums.TaskPriority;
+using ZSLabs.Stride.Domain.Enums;
 using TaskStatus = ZSLabs.Stride.Domain.Enums.TaskStatus;
 using UserRole = ZSLabs.Stride.Domain.Enums.UserRole;
 using ZSLabs.Stride.Domain.Entities;
@@ -11,7 +11,7 @@ public class DomainEntityConstructionTests
     public void TaskConstructor_AllParameters_AssignsExpectedValues()
     {
         var createdAt = DateTime.UtcNow;
-        var task = new ZSLabs.Stride.Domain.Entities.Task(
+        var task = new TaskItem(
             12,
             "Ship feature",
             "Description",

@@ -16,7 +16,9 @@
         },
         "dotnet restore": true,
         "npm run build": true,
-        "npm run dev": true
+        "npm run dev": true,
+        "dotnet ef": true,
+        "npm --prefix src/ZSLabs.Stride.Web": true
     }
 }
 

@@ -4,8 +4,6 @@ using ZSLabs.Stride.App.Services;
 using ZSLabs.Stride.Domain.Entities;
 using ZSLabs.Stride.Domain.Enums;
 using ZSLabs.Stride.Persistence;
-using TaskEntity = ZSLabs.Stride.Domain.Entities.Task;
-using TaskPriority = ZSLabs.Stride.Domain.Enums.TaskPriority;
 using TaskStatus = ZSLabs.Stride.Domain.Enums.TaskStatus;
 
 namespace ZSLabs.Stride.App.Tests.Services;
@@ -13,7 +11,7 @@ namespace ZSLabs.Stride.App.Tests.Services;
 public class TaskServiceTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskAsync_NoStatusProvided_DefaultsToBacklog()
+    public async Task CreateTaskAsync_NoStatusProvided_DefaultsToBacklog()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -32,7 +30,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetTasksAsync_MultiplePrioritiesAndDates_OrdersByPriorityThenCreatedAt()
+    public async Task GetTasksAsync_MultiplePrioritiesAndDates_OrdersByPriorityThenCreatedAt()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -43,11 +41,11 @@ public class TaskServiceTests
         var owner = await AddUserAsync(context, "owner", UserRole.Regular, cancellationToken);
         var space = await AddSpaceAsync(context, owner.Id, true, cancellationToken);
         context.Tasks.AddRange(
-            new TaskEntity(space.Id, "low", null, TaskStatus.Todo, TaskPriority.Low, owner.Id, null, null, DateTime.UtcNow.AddMinutes(-1)),
-            new TaskEntity(space.Id, "critical", null, TaskStatus.Todo, TaskPriority.Critical, owner.Id, null, null, DateTime.UtcNow.AddMinutes(2)),
-            new TaskEntity(space.Id, "high-older", null, TaskStatus.Todo, TaskPriority.High, owner.Id, null, null, DateTime.UtcNow.AddMinutes(-3)),
-            new TaskEntity(space.Id, "high-newer", null, TaskStatus.Todo, TaskPriority.High, owner.Id, null, null, DateTime.UtcNow.AddMinutes(1)),
-            new TaskEntity(space.Id, "backlog", null, TaskStatus.Backlog, TaskPriority.Medium, owner.Id, null, null, DateTime.UtcNow));
+            new TaskItem(space.Id, "low", null, TaskStatus.Todo, TaskPriority.Low, owner.Id, null, null, DateTime.UtcNow.AddMinutes(-1)),
+            new TaskItem(space.Id, "critical", null, TaskStatus.Todo, TaskPriority.Critical, owner.Id, null, null, DateTime.UtcNow.AddMinutes(2)),
+            new TaskItem(space.Id, "high-older", null, TaskStatus.Todo, TaskPriority.High, owner.Id, null, null, DateTime.UtcNow.AddMinutes(-3)),
+            new TaskItem(space.Id, "high-newer", null, TaskStatus.Todo, TaskPriority.High, owner.Id, null, null, DateTime.UtcNow.AddMinutes(1)),
+            new TaskItem(space.Id, "backlog", null, TaskStatus.Backlog, TaskPriority.Medium, owner.Id, null, null, DateTime.UtcNow));
         await context.SaveChangesAsync(cancellationToken);
 
         var service = new TaskService(context);
@@ -57,7 +55,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetTasksAsync_SubtasksWithVariedFields_OrdersOnlyByCreatedAtIncludingTies()
+    public async Task GetTasksAsync_SubtasksWithVariedFields_OrdersOnlyByCreatedAtIncludingTies()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -68,7 +66,7 @@ public class TaskServiceTests
         var owner = await AddUserAsync(context, "owner", UserRole.Regular, cancellationToken);
         var assignee = await AddUserAsync(context, "assignee", UserRole.Regular, cancellationToken);
         var space = await AddSpaceAsync(context, owner.Id, true, cancellationToken);
-        var task = new TaskEntity(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Medium, owner.Id, null, null, DateTime.UtcNow);
+        var task = new TaskItem(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Medium, owner.Id, null, null, DateTime.UtcNow);
         context.Tasks.Add(task);
         await context.SaveChangesAsync(cancellationToken);
         var tiedAt = DateTime.UtcNow;
@@ -91,7 +89,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateTaskStatusAsync_NewStatus_PersistsChange()
+    public async Task UpdateTaskStatusAsync_NewStatus_PersistsChange()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -101,7 +99,7 @@ public class TaskServiceTests
 
         var owner = await AddUserAsync(context, "owner", UserRole.Regular, cancellationToken);
         var space = await AddSpaceAsync(context, owner.Id, true, cancellationToken);
-        var task = new TaskEntity(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Medium, owner.Id, null, null, DateTime.UtcNow);
+        var task = new TaskItem(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Medium, owner.Id, null, null, DateTime.UtcNow);
         context.Tasks.Add(task);
         await context.SaveChangesAsync(cancellationToken);
 
@@ -113,7 +111,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskAsync_AssigneeWithoutSpaceAccess_ThrowsInvalidOperationException()
+    public async Task CreateTaskAsync_AssigneeWithoutSpaceAccess_ThrowsInvalidOperationException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -131,7 +129,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskAsync_NullAssignee_CreatesTask()
+    public async Task CreateTaskAsync_NullAssignee_CreatesTask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -149,7 +147,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskAsync_PrivateSpaceOwnerAssignee_CreatesTask()
+    public async Task CreateTaskAsync_PrivateSpaceOwnerAssignee_CreatesTask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -167,7 +165,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskAsync_PublicSpaceRegularUserAssignee_CreatesTask()
+    public async Task CreateTaskAsync_PublicSpaceRegularUserAssignee_CreatesTask()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -186,7 +184,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateTaskAsync_AdminAssignee_ThrowsInvalidOperationException()
+    public async Task CreateTaskAsync_AdminAssignee_ThrowsInvalidOperationException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -204,7 +202,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateTaskAsync_AdminAssignee_ThrowsInvalidOperationException()
+    public async Task UpdateTaskAsync_AdminAssignee_ThrowsInvalidOperationException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -215,7 +213,7 @@ public class TaskServiceTests
         var owner = await AddUserAsync(context, "owner", UserRole.Regular, cancellationToken);
         var admin = await AddUserAsync(context, "admin", UserRole.Admin, cancellationToken);
         var space = await AddSpaceAsync(context, owner.Id, true, cancellationToken);
-        var task = new TaskEntity(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Low, owner.Id, null, null, DateTime.UtcNow);
+        var task = new TaskItem(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Low, owner.Id, null, null, DateTime.UtcNow);
         context.Tasks.Add(task);
         await context.SaveChangesAsync(cancellationToken);
         var service = new TaskService(context);
@@ -225,7 +223,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteTaskAsync_TaskWithSubtasksAndComments_CascadesDelete()
+    public async Task DeleteTaskAsync_TaskWithSubtasksAndComments_CascadesDelete()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -235,7 +233,7 @@ public class TaskServiceTests
 
         var owner = await AddUserAsync(context, "owner", UserRole.Regular, cancellationToken);
         var space = await AddSpaceAsync(context, owner.Id, true, cancellationToken);
-        var task = new TaskEntity(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Low, owner.Id, null, null, DateTime.UtcNow);
+        var task = new TaskItem(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Low, owner.Id, null, null, DateTime.UtcNow);
         context.Tasks.Add(task);
         await context.SaveChangesAsync(cancellationToken);
 

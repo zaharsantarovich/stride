@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ZSLabs.Stride.Domain.Entities;
-using TaskEntity = ZSLabs.Stride.Domain.Entities.Task;
 
 namespace ZSLabs.Stride.Persistence;
 
@@ -16,7 +15,7 @@ public class StrideDbContext : DbContext
 
     public DbSet<Space> Spaces => Set<Space>();
 
-    public DbSet<TaskEntity> Tasks => Set<TaskEntity>();
+    public DbSet<TaskItem> Tasks => Set<TaskItem>();
 
     public DbSet<Subtask> Subtasks => Set<Subtask>();
 

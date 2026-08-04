@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using ZSLabs.Stride.Api.Contracts;
+using Task = System.Threading.Tasks.Task;
 using ZSLabs.Stride.Api.Controllers;
 using ZSLabs.Stride.App.Services;
 using ZSLabs.Stride.Domain.Enums;
@@ -15,7 +16,7 @@ namespace ZSLabs.Stride.Api.Tests.Controllers;
 public class AuthControllerTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task LoginAsync_ValidCredentials_ReturnsCurrentUserAndSignsIn()
+    public async Task LoginAsync_ValidCredentials_ReturnsCurrentUserAndSignsIn()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var authService = Substitute.For<IAuthService>();
@@ -38,7 +39,7 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task LoginAsync_InvalidCredentials_ReturnsUnauthorized()
+    public async Task LoginAsync_InvalidCredentials_ReturnsUnauthorized()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var authService = Substitute.For<IAuthService>();
@@ -55,7 +56,7 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task LogoutAsync_AuthenticatedUser_SignsOut()
+    public async Task LogoutAsync_AuthenticatedUser_SignsOut()
     {
         var authService = Substitute.For<IAuthService>();
         var authenticationService = Substitute.For<IAuthenticationService>();
@@ -71,7 +72,7 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task MeAsync_Unauthenticated_ReturnsUnauthorized()
+    public async Task MeAsync_Unauthenticated_ReturnsUnauthorized()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var authService = Substitute.For<IAuthService>();
@@ -84,7 +85,7 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task MeAsync_Authenticated_ReturnsCurrentUser()
+    public async Task MeAsync_Authenticated_ReturnsCurrentUser()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var authService = Substitute.For<IAuthService>();

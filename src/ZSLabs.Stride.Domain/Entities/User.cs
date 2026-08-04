@@ -7,8 +7,8 @@ public class User
     public User()
     {
         AuthoredSpaces = new List<Space>();
-        AuthoredTasks = new List<Task>();
-        AssignedTasks = new List<Task>();
+        AuthoredTasks = new List<TaskItem>();
+        AssignedTasks = new List<TaskItem>();
         AuthoredSubtasks = new List<Subtask>();
         AssignedSubtasks = new List<Subtask>();
         Comments = new List<Comment>();
@@ -40,9 +40,9 @@ public class User
 
     public ICollection<Space> AuthoredSpaces { get; set; }
 
-    public ICollection<Task> AuthoredTasks { get; set; }
+    public ICollection<TaskItem> AuthoredTasks { get; set; }
 
-    public ICollection<Task> AssignedTasks { get; set; }
+    public ICollection<TaskItem> AssignedTasks { get; set; }
 
     public ICollection<Subtask> AuthoredSubtasks { get; set; }
 

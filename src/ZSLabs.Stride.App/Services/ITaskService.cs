@@ -1,14 +1,14 @@
-using TaskEntity = ZSLabs.Stride.Domain.Entities.Task;
-using TaskPriority = ZSLabs.Stride.Domain.Enums.TaskPriority;
+using ZSLabs.Stride.Domain.Entities;
+using ZSLabs.Stride.Domain.Enums;
 using TaskStatus = ZSLabs.Stride.Domain.Enums.TaskStatus;
 
 namespace ZSLabs.Stride.App.Services;
 
 public interface ITaskService
 {
-    Task<IReadOnlyList<TaskEntity>> GetTasksAsync(int spaceId, int actorId, CancellationToken cancellationToken);
+    Task<IReadOnlyList<TaskItem>> GetTasksAsync(int spaceId, int actorId, CancellationToken cancellationToken);
 
-    Task<TaskEntity> CreateTaskAsync(
+    Task<TaskItem> CreateTaskAsync(
         int spaceId,
         int actorId,
         string title,
@@ -19,7 +19,7 @@ public interface ITaskService
         DateTime? dueDate,
         CancellationToken cancellationToken);
 
-    Task<TaskEntity> UpdateTaskAsync(
+    Task<TaskItem> UpdateTaskAsync(
         int taskId,
         int actorId,
         string? title,
@@ -30,7 +30,7 @@ public interface ITaskService
         DateTime? dueDate,
         CancellationToken cancellationToken);
 
-    Task<TaskEntity> UpdateTaskStatusAsync(int taskId, int actorId, TaskStatus status, CancellationToken cancellationToken);
+    Task<TaskItem> UpdateTaskStatusAsync(int taskId, int actorId, TaskStatus status, CancellationToken cancellationToken);
 
-    global::System.Threading.Tasks.Task DeleteTaskAsync(int taskId, int actorId, CancellationToken cancellationToken);
+    Task DeleteTaskAsync(int taskId, int actorId, CancellationToken cancellationToken);
 }

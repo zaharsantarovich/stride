@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZSLabs.Stride.Api.Contracts;
 using ZSLabs.Stride.App.Services;
+using ZSLabs.Stride.Domain.Entities;
 using DomainComment = ZSLabs.Stride.Domain.Entities.Comment;
 using DomainSubtask = ZSLabs.Stride.Domain.Entities.Subtask;
-using DomainTask = ZSLabs.Stride.Domain.Entities.Task;
-using TaskContract = ZSLabs.Stride.Api.Contracts.Task;
 
 namespace ZSLabs.Stride.Api.Controllers;
 
@@ -23,7 +22,7 @@ public sealed class TasksController : ControllerBase
     }
 
     [HttpGet("spaces/{spaceId:int}/tasks")]
-    public async Task<ActionResult<IReadOnlyList<TaskContract>>> GetAsync(int spaceId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<Contracts.Task>>> GetAsync(int spaceId, CancellationToken cancellationToken)
     {
         try
         {
@@ -41,7 +40,7 @@ public sealed class TasksController : ControllerBase
     }
 
     [HttpPost("spaces/{spaceId:int}/tasks")]
-    public async Task<ActionResult<TaskContract>> CreateAsync(int spaceId, [FromBody] CreateTaskRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<Contracts.Task>> CreateAsync(int spaceId, [FromBody] CreateTaskRequest request, CancellationToken cancellationToken)
     {
         try
         {
@@ -69,7 +68,7 @@ public sealed class TasksController : ControllerBase
     }
 
     [HttpPut("tasks/{id:int}")]
-    public async Task<ActionResult<TaskContract>> UpdateAsync(int id, [FromBody] UpdateTaskRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<Contracts.Task>> UpdateAsync(int id, [FromBody] UpdateTaskRequest request, CancellationToken cancellationToken)
     {
         try
         {
@@ -101,7 +100,7 @@ public sealed class TasksController : ControllerBase
     }
 
     [HttpPatch("tasks/{id:int}/status")]
-    public async Task<ActionResult<TaskContract>> UpdateStatusAsync(int id, [FromBody] UpdateTaskStatusRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<Contracts.Task>> UpdateStatusAsync(int id, [FromBody] UpdateTaskStatusRequest request, CancellationToken cancellationToken)
     {
         try
         {
@@ -142,9 +141,9 @@ public sealed class TasksController : ControllerBase
         return int.TryParse(value, out var userId) ? userId : throw new UnauthorizedAccessException("Authentication required.");
     }
 
-    private static TaskContract Map(DomainTask task)
+    private static Contracts.Task Map(TaskItem task)
     {
-        return new TaskContract(
+        return new Contracts.Task(
             task.Id,
             task.SpaceId,
             task.Title,

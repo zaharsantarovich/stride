@@ -9,7 +9,7 @@ namespace ZSLabs.Stride.Persistence;
 
 public static class AdminSeeder
 {
-    public static async global::System.Threading.Tasks.Task SeedAdminUserAsync(this IServiceProvider services, IConfiguration configuration, CancellationToken cancellationToken)
+    public static async Task SeedAdminUserAsync(this IServiceProvider services, IConfiguration configuration, CancellationToken cancellationToken)
     {
         using var scope = services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<StrideDbContext>();

@@ -27,5 +27,5 @@ public interface ISubtaskService
         DateTime? dueDate,
         CancellationToken cancellationToken);
 
-    global::System.Threading.Tasks.Task DeleteSubtaskAsync(int subtaskId, int actorId, CancellationToken cancellationToken);
+    Task DeleteSubtaskAsync(int subtaskId, int actorId, CancellationToken cancellationToken);
 }

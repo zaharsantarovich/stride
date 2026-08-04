@@ -29,7 +29,7 @@ public class Comment
 
     public DateTime? UpdatedAt { get; set; }
 
-    public Task? Task { get; set; }
+    public TaskItem? Task { get; set; }
 
     public Subtask? Subtask { get; set; }
 

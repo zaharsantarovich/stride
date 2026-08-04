@@ -61,7 +61,7 @@ public class UserService : IUserService
         return user;
     }
 
-    private async global::System.Threading.Tasks.Task EnsureUniqueUsernameAsync(string username, int? userId, CancellationToken cancellationToken)
+    private async Task EnsureUniqueUsernameAsync(string username, int? userId, CancellationToken cancellationToken)
     {
         var exists = await _dbContext.Users.AnyAsync(
             user => user.Username == username && (!userId.HasValue || user.Id != userId.Value),

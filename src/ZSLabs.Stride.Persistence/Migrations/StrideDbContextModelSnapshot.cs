@@ -137,7 +137,7 @@ namespace ZSLabs.Stride.Persistence.Migrations
                     b.ToTable("Subtasks", (string)null);
                 });
 
-            modelBuilder.Entity("ZSLabs.Stride.Domain.Entities.Task", b =>
+            modelBuilder.Entity("ZSLabs.Stride.Domain.Entities.TaskItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -232,7 +232,7 @@ namespace ZSLabs.Stride.Persistence.Migrations
                         .HasForeignKey("SubtaskId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("ZSLabs.Stride.Domain.Entities.Task", "Task")
+                    b.HasOne("ZSLabs.Stride.Domain.Entities.TaskItem", "Task")
                         .WithMany("Comments")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -268,7 +268,7 @@ namespace ZSLabs.Stride.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ZSLabs.Stride.Domain.Entities.Task", "Task")
+                    b.HasOne("ZSLabs.Stride.Domain.Entities.TaskItem", "Task")
                         .WithMany("Subtasks")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -281,7 +281,7 @@ namespace ZSLabs.Stride.Persistence.Migrations
                     b.Navigation("Task");
                 });
 
-            modelBuilder.Entity("ZSLabs.Stride.Domain.Entities.Task", b =>
+            modelBuilder.Entity("ZSLabs.Stride.Domain.Entities.TaskItem", b =>
                 {
                     b.HasOne("ZSLabs.Stride.Domain.Entities.User", "Assignee")
                         .WithMany("AssignedTasks")
@@ -317,7 +317,7 @@ namespace ZSLabs.Stride.Persistence.Migrations
                     b.Navigation("Comments");
                 });
 
-            modelBuilder.Entity("ZSLabs.Stride.Domain.Entities.Task", b =>
+            modelBuilder.Entity("ZSLabs.Stride.Domain.Entities.TaskItem", b =>
                 {
                     b.Navigation("Comments");
 

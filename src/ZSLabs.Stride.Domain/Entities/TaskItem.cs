@@ -1,17 +1,17 @@
-using TaskPriority = ZSLabs.Stride.Domain.Enums.TaskPriority;
+using ZSLabs.Stride.Domain.Enums;
 using TaskStatus = ZSLabs.Stride.Domain.Enums.TaskStatus;
 
 namespace ZSLabs.Stride.Domain.Entities;
 
-public class Task
+public class TaskItem
 {
-    public Task()
+    public TaskItem()
     {
         Subtasks = new List<Subtask>();
         Comments = new List<Comment>();
     }
 
-    public Task(
+    public TaskItem(
         int spaceId,
         string title,
         string? description,

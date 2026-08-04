@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ZSLabs.Stride.Domain.Entities;
 using ZSLabs.Stride.Persistence;
-using TaskEntity = ZSLabs.Stride.Domain.Entities.Task;
 
 namespace ZSLabs.Stride.App.Services;
 
@@ -79,7 +78,7 @@ public class CommentService : ICommentService
         return comment;
     }
 
-    public async global::System.Threading.Tasks.Task DeleteCommentAsync(int commentId, int actorId, CancellationToken cancellationToken)
+    public async Task DeleteCommentAsync(int commentId, int actorId, CancellationToken cancellationToken)
     {
         var comment = await FindCommentAsync(commentId, cancellationToken);
         EnsureIsAuthor(comment, actorId);
@@ -89,7 +88,7 @@ public class CommentService : ICommentService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<TaskEntity> FindTaskAsync(int taskId, CancellationToken cancellationToken)
+    private async Task<TaskItem> FindTaskAsync(int taskId, CancellationToken cancellationToken)
     {
         return await _dbContext.Tasks
             .SingleOrDefaultAsync(task => task.Id == taskId, cancellationToken)
@@ -122,12 +121,12 @@ public class CommentService : ICommentService
         return _dbContext.Comments.Include(comment => comment.Author);
     }
 
-    private async global::System.Threading.Tasks.Task EnsureCanAccessCommentParentAsync(
+    private async Task EnsureCanAccessCommentParentAsync(
         Comment comment,
         int actorId,
         CancellationToken cancellationToken)
     {
-        TaskEntity task;
+        TaskItem task;
 
         if (comment.TaskId.HasValue)
         {

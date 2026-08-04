@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using ZSLabs.Stride.Api.Contracts;
+using Task = System.Threading.Tasks.Task;
 using ZSLabs.Stride.Api.Controllers;
 using ZSLabs.Stride.App.Services;
 using ZSLabs.Stride.Domain.Entities;
@@ -44,7 +45,7 @@ public class UsersControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetRegularUsersAsync_NoFilter_ReturnsLookupContracts()
+    public async Task GetRegularUsersAsync_NoFilter_ReturnsLookupContracts()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var userService = Substitute.For<IUserService>();
@@ -66,13 +67,13 @@ public class UsersControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateAsync_DuplicateUsername_ReturnsConflict()
+    public async Task CreateAsync_DuplicateUsername_ReturnsConflict()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var userService = Substitute.For<IUserService>();
         userService
             .CreateRegularUserAsync("taken", "Password123!", null, cancellationToken)
-            .Returns(_ => global::System.Threading.Tasks.Task.FromException<DomainUser>(new InvalidOperationException("Username already exists.")));
+            .Returns(_ => Task.FromException<DomainUser>(new InvalidOperationException("Username already exists.")));
 
         var controller = new UsersController(userService);
 
@@ -84,13 +85,13 @@ public class UsersControllerTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateAsync_MissingUser_ReturnsNotFound()
+    public async Task UpdateAsync_MissingUser_ReturnsNotFound()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var userService = Substitute.For<IUserService>();
         userService
             .UpdateRegularUserAsync(7, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), cancellationToken)
-            .Returns(_ => global::System.Threading.Tasks.Task.FromException<DomainUser>(new KeyNotFoundException()));
+            .Returns(_ => Task.FromException<DomainUser>(new KeyNotFoundException()));
 
         var controller = new UsersController(userService);
 

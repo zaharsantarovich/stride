@@ -50,7 +50,7 @@ public class Subtask
 
     public DateTime? UpdatedAt { get; set; }
 
-    public Task? Task { get; set; }
+    public TaskItem? Task { get; set; }
 
     public User? Author { get; set; }
 

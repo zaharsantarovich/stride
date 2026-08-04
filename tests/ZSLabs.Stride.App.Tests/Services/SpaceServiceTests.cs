@@ -1,11 +1,10 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using TaskEntity = ZSLabs.Stride.Domain.Entities.Task;
-using TaskPriority = ZSLabs.Stride.Domain.Enums.TaskPriority;
 using TaskStatus = ZSLabs.Stride.Domain.Enums.TaskStatus;
 using UserRole = ZSLabs.Stride.Domain.Enums.UserRole;
 using ZSLabs.Stride.App.Services;
 using ZSLabs.Stride.Domain.Entities;
+using ZSLabs.Stride.Domain.Enums;
 using ZSLabs.Stride.Persistence;
 
 namespace ZSLabs.Stride.App.Tests.Services;
@@ -13,7 +12,7 @@ namespace ZSLabs.Stride.App.Tests.Services;
 public class SpaceServiceTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task CreateSpaceAsync_DuplicateKey_ThrowsInvalidOperationException()
+    public async Task CreateSpaceAsync_DuplicateKey_ThrowsInvalidOperationException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -30,7 +29,7 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetVisibleSpacesAsync_PrivateAndPublicSpaces_FiltersInaccessiblePrivateSpaces()
+    public async Task GetVisibleSpacesAsync_PrivateAndPublicSpaces_FiltersInaccessiblePrivateSpaces()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -53,7 +52,7 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateSpaceAsync_NonAuthorVisibilityChange_ThrowsUnauthorizedAccessException()
+    public async Task UpdateSpaceAsync_NonAuthorVisibilityChange_ThrowsUnauthorizedAccessException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -78,7 +77,7 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task DeleteSpaceAsync_SpaceWithTasksAndComments_CascadesDelete()
+    public async Task DeleteSpaceAsync_SpaceWithTasksAndComments_CascadesDelete()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -91,7 +90,7 @@ public class SpaceServiceTests
         context.Spaces.Add(space);
         await context.SaveChangesAsync(cancellationToken);
 
-        var task = new TaskEntity(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Low, owner.Id, null, null, DateTime.UtcNow);
+        var task = new TaskItem(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Low, owner.Id, null, null, DateTime.UtcNow);
         context.Tasks.Add(task);
         await context.SaveChangesAsync(cancellationToken);
         context.Comments.Add(new Comment(task.Id, null, owner.Id, "Comment", DateTime.UtcNow));

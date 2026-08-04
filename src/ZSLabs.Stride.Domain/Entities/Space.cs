@@ -4,7 +4,7 @@ public class Space
 {
     public Space()
     {
-        Tasks = new List<Task>();
+        Tasks = new List<TaskItem>();
     }
 
     public Space(string key, string name, int authorId, bool isPublic, DateTime createdAtUtc)
@@ -33,5 +33,5 @@ public class Space
 
     public User? Author { get; set; }
 
-    public ICollection<Task> Tasks { get; set; }
+    public ICollection<TaskItem> Tasks { get; set; }
 }

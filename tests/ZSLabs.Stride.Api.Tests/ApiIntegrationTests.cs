@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using ZSLabs.Stride.Api.Contracts;
+using Task = System.Threading.Tasks.Task;
 using ApiTask = ZSLabs.Stride.Api.Contracts.Task;
 using ApiTaskStatus = ZSLabs.Stride.Api.Contracts.TaskStatus;
 
@@ -16,7 +17,7 @@ public class ApiIntegrationTests : IAsyncLifetime
     private readonly StrideApiFactory _factory = new();
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UserManagement_AdminCreatesRegularUser_RegularUsersDeniedAdminAccess()
+    public async Task UserManagement_AdminCreatesRegularUser_RegularUsersDeniedAdminAccess()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var suffix = Guid.NewGuid().ToString("N")[..8];
@@ -45,7 +46,7 @@ public class ApiIntegrationTests : IAsyncLifetime
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task SpaceCollaboration_PublicPrivateVisibility_UsersObeyAccessRules()
+    public async Task SpaceCollaboration_PublicPrivateVisibility_UsersObeyAccessRules()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var suffix = Guid.NewGuid().ToString("N")[..8];
@@ -83,7 +84,7 @@ public class ApiIntegrationTests : IAsyncLifetime
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task BoardWorkflow_FullTaskLifecycle_TasksSubtasksCommentsManaged()
+    public async Task BoardWorkflow_FullTaskLifecycle_TasksSubtasksCommentsManaged()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var suffix = Guid.NewGuid().ToString("N")[..8];
@@ -163,35 +164,35 @@ public class ApiIntegrationTests : IAsyncLifetime
         }
     }
 
-    private static async global::System.Threading.Tasks.Task<CurrentUser> LoginAsync(HttpClient client, string username, string password, CancellationToken cancellationToken)
+    private static async Task<CurrentUser> LoginAsync(HttpClient client, string username, string password, CancellationToken cancellationToken)
     {
         var response = await client.PostAsJsonAsync("/auth/login", new LoginRequest(username, password), cancellationToken);
         response.EnsureSuccessStatusCode();
         return await ReadAsync<CurrentUser>(response, cancellationToken);
     }
 
-    private static async global::System.Threading.Tasks.Task<TResponse> GetAsync<TResponse>(HttpClient client, string path, CancellationToken cancellationToken)
+    private static async Task<TResponse> GetAsync<TResponse>(HttpClient client, string path, CancellationToken cancellationToken)
     {
         var response = await client.GetAsync(path, cancellationToken);
         response.EnsureSuccessStatusCode();
         return await ReadAsync<TResponse>(response, cancellationToken);
     }
 
-    private static async global::System.Threading.Tasks.Task<TResponse> PostAsync<TRequest, TResponse>(HttpClient client, string path, TRequest request, HttpStatusCode expectedStatus, CancellationToken cancellationToken)
+    private static async Task<TResponse> PostAsync<TRequest, TResponse>(HttpClient client, string path, TRequest request, HttpStatusCode expectedStatus, CancellationToken cancellationToken)
     {
         var response = await client.PostAsJsonAsync(path, request, cancellationToken);
         Assert.Equal(expectedStatus, response.StatusCode);
         return await ReadAsync<TResponse>(response, cancellationToken);
     }
 
-    private static async global::System.Threading.Tasks.Task<TResponse> PutAsync<TRequest, TResponse>(HttpClient client, string path, TRequest request, CancellationToken cancellationToken)
+    private static async Task<TResponse> PutAsync<TRequest, TResponse>(HttpClient client, string path, TRequest request, CancellationToken cancellationToken)
     {
         var response = await client.PutAsJsonAsync(path, request, cancellationToken);
         response.EnsureSuccessStatusCode();
         return await ReadAsync<TResponse>(response, cancellationToken);
     }
 
-    private static async global::System.Threading.Tasks.Task<TResponse> PatchAsync<TRequest, TResponse>(HttpClient client, string path, TRequest request, CancellationToken cancellationToken)
+    private static async Task<TResponse> PatchAsync<TRequest, TResponse>(HttpClient client, string path, TRequest request, CancellationToken cancellationToken)
     {
         var requestMessage = new HttpRequestMessage(HttpMethod.Patch, path)
         {
@@ -203,13 +204,13 @@ public class ApiIntegrationTests : IAsyncLifetime
         return await ReadAsync<TResponse>(response, cancellationToken);
     }
 
-    private static async global::System.Threading.Tasks.Task PostNoContentAsync(HttpClient client, string path, CancellationToken cancellationToken)
+    private static async Task PostNoContentAsync(HttpClient client, string path, CancellationToken cancellationToken)
     {
         var response = await client.PostAsync(path, null, cancellationToken);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
-    private static async global::System.Threading.Tasks.Task<T> ReadAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken)
+    private static async Task<T> ReadAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken)
     {
         var value = await response.Content.ReadFromJsonAsync<T>(JsonOptions, cancellationToken);
         Assert.NotNull(value);

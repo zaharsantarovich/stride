@@ -4,8 +4,6 @@ using ZSLabs.Stride.App.Services;
 using ZSLabs.Stride.Domain.Entities;
 using ZSLabs.Stride.Domain.Enums;
 using ZSLabs.Stride.Persistence;
-using TaskEntity = ZSLabs.Stride.Domain.Entities.Task;
-using TaskPriority = ZSLabs.Stride.Domain.Enums.TaskPriority;
 using TaskStatus = ZSLabs.Stride.Domain.Enums.TaskStatus;
 
 namespace ZSLabs.Stride.App.Tests.Services;
@@ -13,7 +11,7 @@ namespace ZSLabs.Stride.App.Tests.Services;
 public class CommentServiceTests
 {
     [Fact]
-    public async global::System.Threading.Tasks.Task CommentCreation_TaskAndSubtaskTargets_CreatesComments()
+    public async Task CommentCreation_TaskAndSubtaskTargets_CreatesComments()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -40,7 +38,7 @@ public class CommentServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CommentModification_NonAuthor_ThrowsUnauthorizedAccessException()
+    public async Task CommentModification_NonAuthor_ThrowsUnauthorizedAccessException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -65,7 +63,7 @@ public class CommentServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetTaskCommentsAsync_MultipleComments_ReturnsAscendingCreationOrder()
+    public async Task GetTaskCommentsAsync_MultipleComments_ReturnsAscendingCreationOrder()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -88,7 +86,7 @@ public class CommentServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task GetSubtaskCommentsAsync_MultipleAuthors_ReturnsOrderedAuthorGraph()
+    public async Task GetSubtaskCommentsAsync_MultipleAuthors_ReturnsOrderedAuthorGraph()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -116,7 +114,7 @@ public class CommentServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task UpdateCommentAsync_AuthorWithCurrentAccess_UpdatesAndLoadsAuthor()
+    public async Task UpdateCommentAsync_AuthorWithCurrentAccess_UpdatesAndLoadsAuthor()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -139,7 +137,7 @@ public class CommentServiceTests
     }
 
     [Fact]
-    public async global::System.Threading.Tasks.Task CommentModification_AuthorWhoLostParentSpaceAccess_ThrowsUnauthorizedAccessException()
+    public async Task CommentModification_AuthorWhoLostParentSpaceAccess_ThrowsUnauthorizedAccessException()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var connection = new SqliteConnection("Data Source=:memory:");
@@ -170,13 +168,13 @@ public class CommentServiceTests
         return user;
     }
 
-    private static async Task<TaskEntity> AddTaskAsync(StrideDbContext context, int ownerId, bool isPublic, CancellationToken cancellationToken)
+    private static async Task<TaskItem> AddTaskAsync(StrideDbContext context, int ownerId, bool isPublic, CancellationToken cancellationToken)
     {
         var space = new Space($"space-{Guid.NewGuid():N}", "Space", ownerId, isPublic, DateTime.UtcNow);
         context.Spaces.Add(space);
         await context.SaveChangesAsync(cancellationToken);
 
-        var task = new TaskEntity(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Medium, ownerId, null, null, DateTime.UtcNow);
+        var task = new TaskItem(space.Id, "Task", null, TaskStatus.Backlog, TaskPriority.Medium, ownerId, null, null, DateTime.UtcNow);
         context.Tasks.Add(task);
         await context.SaveChangesAsync(cancellationToken);
         return task;

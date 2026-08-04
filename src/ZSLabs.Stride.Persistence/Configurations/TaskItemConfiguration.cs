@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TaskEntity = ZSLabs.Stride.Domain.Entities.Task;
+using ZSLabs.Stride.Domain.Entities;
 
 namespace ZSLabs.Stride.Persistence.Configurations;
 
-public sealed class TaskConfiguration : IEntityTypeConfiguration<TaskEntity>
+public sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
 {
-    public void Configure(EntityTypeBuilder<TaskEntity> builder)
+    public void Configure(EntityTypeBuilder<TaskItem> builder)
     {
         builder.ToTable("Tasks");
 

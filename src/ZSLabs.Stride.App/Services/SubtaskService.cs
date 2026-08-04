@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using ZSLabs.Stride.Domain.Entities;
 using ZSLabs.Stride.Domain.Enums;
 using ZSLabs.Stride.Persistence;
-using TaskEntity = ZSLabs.Stride.Domain.Entities.Task;
 
 namespace ZSLabs.Stride.App.Services;
 
@@ -92,7 +91,7 @@ public class SubtaskService : ISubtaskService
         return await LoadSubtaskGraphAsync(subtask.Id, cancellationToken);
     }
 
-    public async global::System.Threading.Tasks.Task DeleteSubtaskAsync(int subtaskId, int actorId, CancellationToken cancellationToken)
+    public async Task DeleteSubtaskAsync(int subtaskId, int actorId, CancellationToken cancellationToken)
     {
         var subtask = await FindSubtaskAsync(subtaskId, cancellationToken);
         var task = await FindTaskAsync(subtask.TaskId, cancellationToken);
@@ -112,7 +111,7 @@ public class SubtaskService : ISubtaskService
             .ThenInclude(comment => comment.Author);
     }
 
-    private async Task<TaskEntity> FindTaskAsync(int taskId, CancellationToken cancellationToken)
+    private async Task<TaskItem> FindTaskAsync(int taskId, CancellationToken cancellationToken)
     {
         return await _dbContext.Tasks
             .SingleOrDefaultAsync(task => task.Id == taskId, cancellationToken)
@@ -140,7 +139,7 @@ public class SubtaskService : ISubtaskService
             ?? throw new KeyNotFoundException("Subtask not found.");
     }
 
-    private async global::System.Threading.Tasks.Task EnsureAssigneeHasSpaceAccessAsync(Space space, int? assigneeId, CancellationToken cancellationToken)
+    private async Task EnsureAssigneeHasSpaceAccessAsync(Space space, int? assigneeId, CancellationToken cancellationToken)
     {
         if (!assigneeId.HasValue)
         {
