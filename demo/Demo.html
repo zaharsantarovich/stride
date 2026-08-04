@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A practical walkthrough of Spec Driven Development with GitHub Spec Kit.">
+  <title>Spec Driven Development with Spec Kit</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f4ec;
+      --paper-raised: #fffdf7;
+      --ink: #202624;
+      --muted: #66706c;
+      --line: #d9d5c9;
+      --navy: #183a4a;
+      --coral: #d85b43;
+      --green: #28755d;
+      --yellow: #e5b84a;
+      --code: #edf2ef;
+      --code-ink: #26332e;
+      --shadow: 0 18px 50px rgb(32 38 36 / 10%);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(rgb(24 58 74 / 4%) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(24 58 74 / 4%) 1px, transparent 1px);
+      background-size: 28px 28px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    a {
+      color: var(--green);
+      text-underline-offset: 0.2em;
+      text-decoration-thickness: 1px;
+    }
+
+    a:hover {
+      color: var(--coral);
+    }
+
+    a:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid var(--yellow);
+      outline-offset: 4px;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 10;
+      padding: 8px 12px;
+      color: var(--ink);
+      background: var(--paper-raised);
+      border: 2px solid var(--navy);
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .masthead {
+      position: relative;
+      min-height: min(560px, 82vh);
+      display: grid;
+      align-items: end;
+      overflow: hidden;
+      color: var(--ink);
+      background: var(--paper-raised);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .masthead::before {
+      content: "SPEC";
+      position: absolute;
+      top: -0.3em;
+      right: -0.03em;
+      color: rgb(24 58 74 / 5%);
+      font-family: "Trebuchet MS", sans-serif;
+      font-size: clamp(10rem, 31vw, 31rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .masthead__inner {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 96px 0 72px;
+    }
+
+    .eyebrow,
+    .section-label {
+      margin: 0 0 16px;
+      color: var(--coral);
+      font-family: "Trebuchet MS", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: "Trebuchet MS", sans-serif;
+      line-height: 1.1;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font-size: clamp(3rem, 8vw, 7rem);
+    }
+
+    .masthead__lede {
+      max-width: 710px;
+      margin: 28px 0 0;
+      color: var(--muted);
+      font-size: clamp(1.08rem, 2vw, 1.4rem);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 820px);
+      gap: clamp(40px, 7vw, 100px);
+      width: min(1140px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 72px 0 120px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 32px;
+      align-self: start;
+      padding-top: 8px;
+      font-family: "Trebuchet MS", sans-serif;
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .toc strong {
+      display: block;
+      margin-bottom: 14px;
+      color: var(--coral);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .toc ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border-left: 1px solid var(--line);
+    }
+
+    .toc li + li {
+      margin-top: 2px;
+    }
+
+    .toc a {
+      display: block;
+      padding: 7px 0 7px 18px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      color: var(--coral);
+      border-left: 3px solid var(--coral);
+      margin-left: -2px;
+      padding-left: 17px;
+    }
+
+    main {
+      min-width: 0;
+    }
+
+    section {
+      scroll-margin-top: 28px;
+    }
+
+    section + section {
+      margin-top: 92px;
+      padding-top: 72px;
+      border-top: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0 0 30px;
+      color: var(--navy);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+    }
+
+    h3 {
+      margin: 48px 0 18px;
+      color: var(--navy);
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+    }
+
+    p {
+      margin: 0 0 22px;
+    }
+
+    ul,
+    ol {
+      padding-left: 1.35em;
+    }
+
+    li {
+      padding-left: 0.35em;
+    }
+
+    li + li {
+      margin-top: 8px;
+    }
+
+    li::marker {
+      color: var(--coral);
+      font-family: "Trebuchet MS", sans-serif;
+      font-weight: 700;
+    }
+
+    .evolution {
+      padding: 26px 28px;
+      border-left: 6px solid var(--coral);
+      background: var(--paper-raised);
+      box-shadow: var(--shadow);
+      font-size: 1.08rem;
+    }
+
+    .evolution strong {
+      color: var(--coral);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 28px 0;
+      border: 1px solid var(--line);
+      background: var(--paper-raised);
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      min-width: 650px;
+      border-collapse: collapse;
+      font-family: "Trebuchet MS", sans-serif;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    th,
+    td {
+      padding: 15px 18px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    thead th {
+      color: var(--navy);
+      background: #e4eee9;
+    }
+
+    tbody th {
+      color: var(--navy);
+      font-weight: 700;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgb(40 117 93 / 5%);
+    }
+
+    tbody tr:last-child th,
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .project-link {
+      display: inline-flex;
+      margin-bottom: 16px;
+      font-family: "Trebuchet MS", sans-serif;
+      font-weight: 700;
+    }
+
+    pre {
+      position: relative;
+      max-width: 100%;
+      overflow-x: auto;
+      margin: 24px 0 30px;
+      padding: 28px;
+      color: var(--code-ink);
+      background: var(--code);
+      border-left: 6px solid var(--green);
+      box-shadow: var(--shadow);
+      font: 0.84rem/1.65 Consolas, "Courier New", monospace;
+      tab-size: 2;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    :not(pre) > code {
+      padding: 0.12em 0.35em;
+      color: var(--navy);
+      background: rgb(24 58 74 / 8%);
+      font-size: 0.88em;
+    }
+
+    details {
+      margin: 24px 0;
+      border: 1px solid var(--line);
+      background: var(--paper-raised);
+      box-shadow: 0 10px 30px rgb(32 38 36 / 7%);
+    }
+
+    summary {
+      position: relative;
+      padding: 18px 58px 18px 22px;
+      color: var(--navy);
+      cursor: pointer;
+      font-family: "Trebuchet MS", sans-serif;
+      font-weight: 700;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      position: absolute;
+      top: 50%;
+      right: 22px;
+      color: var(--coral);
+      font-size: 1.5rem;
+      transform: translateY(-52%);
+    }
+
+    details[open] summary::after {
+      content: "−";
+    }
+
+    details[open] summary {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .details-body {
+      padding: 4px 22px 1px;
+    }
+
+    .details-body pre {
+      box-shadow: none;
+    }
+
+    .callout {
+      margin: 30px 0;
+      padding: 20px 24px;
+      border: 1px solid rgb(229 184 74 / 70%);
+      background: rgb(229 184 74 / 13%);
+    }
+
+    .finding-list {
+      padding: 0;
+      list-style: none;
+    }
+
+    .finding-list > li {
+      position: relative;
+      margin: 0;
+      padding: 20px 0 20px 52px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .finding-list > li::before {
+      position: absolute;
+      top: 20px;
+      left: 6px;
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      font-family: "Trebuchet MS", sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .finding-list > .positive::before {
+      content: "+";
+      color: var(--green);
+    }
+
+    .finding-list > .neutral::before {
+      content: "~";
+      color: var(--yellow);
+    }
+
+    .finding-list > .negative::before {
+      content: "−";
+      color: var(--coral);
+    }
+
+    .finding-list > .note::before {
+      content: "→";
+      color: var(--navy);
+    }
+
+    .finding-list ul {
+      margin-top: 10px;
+    }
+
+    footer {
+      padding: 34px 24px;
+      color: var(--muted);
+      background: #ebe7dc;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      font-family: "Trebuchet MS", sans-serif;
+      font-size: 0.82rem;
+    }
+
+    @media (max-width: 860px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+        width: min(100% - 36px, 820px);
+        padding-top: 42px;
+      }
+
+      .toc {
+        position: static;
+        padding: 18px 20px;
+        background: var(--paper-raised);
+        border: 1px solid var(--line);
+      }
+
+      .toc ol {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        border: 0;
+      }
+
+      .toc a,
+      .toc a:hover {
+        margin: 0;
+        padding: 7px 8px;
+        border: 0;
+      }
+
+      section + section {
+        margin-top: 64px;
+        padding-top: 52px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body {
+        font-size: 16px;
+      }
+
+      .masthead {
+        min-height: 540px;
+      }
+
+      .masthead__inner {
+        width: calc(100% - 36px);
+        padding-bottom: 48px;
+      }
+
+      .toc ol {
+        grid-template-columns: 1fr;
+      }
+
+      pre {
+        padding: 20px 18px;
+        font-size: 0.78rem;
+      }
+
+      .evolution {
+        padding: 20px;
+      }
+
+      .finding-list > li {
+        padding-left: 44px;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        font-size: 11pt;
+      }
+
+      .masthead {
+        min-height: 0;
+        color: var(--ink);
+        background: white;
+        border-bottom: 4px solid var(--navy);
+      }
+
+      .masthead::before,
+      .toc,
+      .skip-link,
+      footer {
+        display: none;
+      }
+
+      .masthead__inner {
+        width: 100%;
+        padding: 24px 0;
+      }
+
+      .eyebrow,
+      .masthead__lede {
+        color: var(--ink);
+      }
+
+      h1 {
+        font-size: 36pt;
+      }
+
+      .layout {
+        display: block;
+        width: 100%;
+        padding: 30px 0;
+      }
+
+      section + section {
+        margin-top: 38px;
+        padding-top: 28px;
+      }
+
+      details {
+        break-inside: avoid;
+      }
+
+      details:not([open]) > .details-body {
+        display: block;
+      }
+
+      pre,
+      .table-wrap,
+      .evolution {
+        box-shadow: none;
+      }
+
+      a {
+        color: inherit;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="masthead">
+    <div class="masthead__inner">
+      <p class="eyebrow">A practical development workflow</p>
+      <h1>Spec Driven Development with Spec Kit</h1>
+      <p class="masthead__lede">From requirements to implementation: a walkthrough, framework comparison, demo flow, and field notes.</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" aria-label="On this page">
+      <strong>On this page</strong>
+      <ol>
+        <li><a href="#why-sdd">Why SDD?</a></li>
+        <li><a href="#comparison">Frameworks</a></li>
+        <li><a href="#demo-project">Demo project</a></li>
+        <li><a href="#initialize">Initialize</a></li>
+        <li><a href="#build">Build flow</a></li>
+        <li><a href="#findings">Findings</a></li>
+      </ol>
+    </nav>
+
+    <main id="main-content">
+      <section id="why-sdd">
+        <p class="section-label">01 / Context</p>
+        <h2>Why SDD Over Planning Mode?</h2>
+        <p class="evolution">Prompt Engineering → Vibe Coding → <strong>Context Engineering (including plan mode and SDD) — we are here</strong> → Loop Engineering / Dark Factory / something else</p>
+        <p>Benefits according to the authors of SDD frameworks:</p>
+        <ul>
+          <li>Hierarchical documents: requirements → architecture → implementation details</li>
+          <li>Structured documents with a consistent format</li>
+          <li>Specifications can serve as a source of truth for the project</li>
+          <li>Changes made at one level can automatically propagate to lower levels</li>
+          <li>Better identification of edge cases and conflicting or missing requirements</li>
+        </ul>
+      </section>
+
+      <section id="comparison">
+        <p class="section-label">02 / Landscape</p>
+        <h2>Comparison of SDD Frameworks</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Measure</th>
+                <th scope="col">Spec Kit</th>
+                <th scope="col">OpenSpec</th>
+                <th scope="col">BMAD</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Stars at GitHub</th><td>121k</td><td>61k</td><td>51k</td></tr>
+              <tr><th scope="row">Complexity</th><td>Medium to high</td><td>Low to medium</td><td>Medium to high</td></tr>
+              <tr><th scope="row">Flexibility</th><td>Moderate</td><td>High</td><td>Lower</td></tr>
+              <tr><th scope="row">Greenfield usage</th><td>Strong fit</td><td>Good fit</td><td>Strong fit</td></tr>
+              <tr><th scope="row">Brownfield usage</th><td>Good fit</td><td>Strong fit</td><td>Good fit</td></tr>
+              <tr><th scope="row">Supported by</th><td>GitHub</td><td>Community, backed by Y Combinator</td><td>Community</td></tr>
+              <tr><th scope="row">License</th><td>MIT</td><td>MIT</td><td>MIT</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="demo-project">
+        <p class="section-label">03 / Example</p>
+        <h2>Demo Project</h2>
+        <p>Task tracking web application:</p>
+        <a class="project-link" href="https://github.com/zaharsantarovich/stride">github.com/zaharsantarovich/stride</a>
+        <ul>
+          <li>Public access</li>
+          <li>Base entities: users, spaces to organize tasks, boards, tasks, subtasks, comments</li>
+          <li>Technical stack:
+            <ul>
+              <li>Backend: .NET 10, REST API, SQLite, Entity Framework Core</li>
+              <li>Frontend: React, TypeScript, Tailwind CSS, dnd-kit, Vite</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section id="initialize">
+        <p class="section-label">04 / Setup</p>
+        <h2>Initialize Project with Spec Kit</h2>
+
+        <h3>Step 1: Install Prerequisites</h3>
+        <ul>
+          <li>Python</li>
+          <li>Python uv package manager</li>
+          <li><code>pip install PyYAML</code> (optional?)</li>
+        </ul>
+
+        <h3>Step 2: Install Specify CLI</h3>
+        <pre><code>uv tool install specify-cli --from git+https://github.com/github/spec-kit.git@v0.12.15</code></pre>
+
+        <h3>Step 3: Initialize Repository</h3>
+        <pre><code>specify init my-project --integration copilot</code></pre>
+        <p>Adds Spec Kit custom agents, prompts, templates, configuration files, etc.</p>
+
+        <h3>Step 4: Create Constitution</h3>
+        <p>Initial version:</p>
+        <pre><code>/speckit.constitution
+
+Web UI should support both desktop and mobile devices.
+Support of only latest versions of popular browsers is required.
+Use .NET 10 for backend.
+Use SQLite for database.
+Use React and TypeScript for frontend.
+Unit test coverage should be at least 80%.</code></pre>
+        <p class="callout"><strong>Question:</strong> Should I add tech stack details to the constitution?</p>
+      </section>
+
+      <section id="build">
+        <p class="section-label">05 / Workflow</p>
+        <h2>Build With Spec Kit</h2>
+
+        <h3>Flow</h3>
+        <ol>
+          <li>Create Spec.</li>
+          <li>Clarify Spec (optional).</li>
+          <li>Create a Technical Implementation Plan.</li>
+          <li>Create Tasks.</li>
+          <li>Analyze All Documents Before Implementation (optional).</li>
+          <li>Implement Tasks.</li>
+        </ol>
+
+        <h3>Step 1: Create Spec</h3>
+        <details>
+          <summary>MVP</summary>
+          <div class="details-body">
+            <pre><code>/speckit.specify
+
+Build a task planning application for personal and family usage.
+
+Tasks should be grouped by spaces.
+Users should be able to create a new space and specify if it is private or public.
+Public spaces should be visible to all users, private spaces are visible only to author.
+Any user should be able to perform CRUD operations on public spaces.
+Required space fields: Key, Name, Author, Public, CreationDate.
+Each space should have a unique key that is entered by the user.
+Only the author of a space should be able to change its public/private status.
+For a new user, no spaces should be created by default.
+Each space should have a single board containing tasks.
+
+Boards should organize tasks into columns based on their status.
+Users should be able to drag and drop tasks between columns to change their status.
+Tasks may have multiple subtasks.
+Users should be able to create, update, and delete tasks and subtasks.
+Task required fields: Title, Author, Status, Priority, CreationDate.
+Task optional fields: Description, Assignee, DueDate.
+Subtask required fields: Title, Author, Status, CreationDate.
+Subtask optional fields: Description, Assignee, DueDate.
+Task status values: Backlog, Todo, In Progress, Done, Archived.
+Subtask status values: Todo, In Progress, Done.
+Task priority values: Low, Medium, High, Critical.
+Subtasks should be displayed on the board as a list under their parent task.
+
+Users should be able to add comments to tasks and subtasks.
+Users should be able to edit and delete their own comments.
+Comment required fields: Author, Content, CreationDate.
+Comments should be sorted by CreationDate in ascending order.
+
+Only a special single admin user should be able to create and update regular user accounts.
+For simplicity, it is not possible to delete or deactivate regular user accounts.
+Regular users should not be able to create and manage accounts for themselves.
+The admin user will manage only users, not tasks or spaces.
+Task functionality should not be available to the admin user.
+The admin user and regular users should be able to log in using a username and password.
+Required user fields: Username and Password.
+Optional user fields: Email.
+
+Delete operation for spaces, tasks, subtasks, and comments should be implemented as a hard delete, meaning that the entity is deleted from the database.
+Delete operation for entity also deletes all its child entities.
+All date fields should be stored in UTC format in the database but displayed in the user's local time zone in the UI.</code></pre>
+          </div>
+        </details>
+
+        <details>
+          <summary>Feature example</summary>
+          <div class="details-body">
+            <pre><code>/speckit.specify
+
+Tasks are currently edited inline on the board and added via a form at the top of the board.
+Add a feature that allows users to edit tasks through a modal dialog that opens when they click a task.
+Tasks should also be added through the same modal dialog, which opens when the user clicks the “Create Task” button at the top of the board.
+For each task, the board should display the title, priority, assignee’s username, and the titles of its subtasks.
+The modal dialog should take up the entire screen on mobile devices and most of the screen on desktop devices, where it should be centered.
+Tasks and subtasks should be read-only on the board.
+The current form for adding tasks should be removed from the board.</code></pre>
+          </div>
+        </details>
+
+        <p>Generated files: <code>spec.md</code> and <code>requirements.md</code>.<br><strong>Specs shouldn't contain any technical details!</strong></p>
+
+        <h3>Step 2: Clarify Spec (optional)</h3>
+        <pre><code>/speckit.clarify</code></pre>
+        <p>Adds a Clarifications section to the <code>spec.md</code>.</p>
+        <p>Modes:</p>
+        <ul>
+          <li>Automated / structured</li>
+          <li>Manual</li>
+        </ul>
+
+        <h3>Step 3: Create a Technical Implementation Plan</h3>
+        <details>
+          <summary>MVP</summary>
+          <div class="details-body">
+            <pre><code>/speckit.plan
+
+Do not use the same domain for the REST API as for the frontend with an /api suffix.
+For local development, use localhost and different ports for the frontend and REST API.
+Use the latest stable version of TypeScript that is v6 as of today.
+Use React state, don't add external state management libraries like Redux or Zustand.
+Use Tailwind CSS (the latest stable version is v4.x.x as of today) for styling the frontend.
+Use dnd-kit for drag and drop functionality at space board.
+Use Vite (the latest stable version is v8.x.x as of today) for frontend build tool.
+
+Use xunit.v3 for .NET unit testing and NSubstitute for mocking.
+
+Use autoincrementing integer primary keys for all entities in the database.
+Use ASP.NET Core Identity PasswordHasher&lt;TUser&gt; for password hashing and verification.</code></pre>
+          </div>
+        </details>
+
+        <details>
+          <summary>Feature example</summary>
+          <div class="details-body">
+            <pre><code>/speckit.plan
+
+In a private space, only the current user can be assigned to tasks and subtasks.
+In a public space, any regular user can be assigned to tasks and subtasks.
+Don't add unit tests for the frontend.</code></pre>
+          </div>
+        </details>
+
+        <p>Generated files: <code>plan.md</code>, <code>research.md</code>, <code>quickstart.md</code>, <code>data-model.md</code>, contracts (<code>openapi.yaml</code>, for example).</p>
+
+        <h3>Step 4: Create Tasks</h3>
+        <pre><code>/speckit.tasks
+
+Add a task or tasks to verify the planned changes in the built-in browser in VS Code.
+Use the regular user with the username "a" and password "a" to log in.
+This user has already been added to the database.
+Do not parallelize tasks.</code></pre>
+        <p>Generated files: <code>tasks.md</code>.</p>
+
+        <h3>Step 5: Analyze All Documents Before Implementation (optional)</h3>
+        <pre><code>/speckit.analyze</code></pre>
+        <p>Run it using several models for a cross-check.</p>
+
+        <h3>Step 6: Implement Tasks</h3>
+        <pre><code>/speckit.implement</code></pre>
+      </section>
+
+      <section id="findings">
+        <p class="section-label">06 / Retrospective</p>
+        <h2>Personal Findings</h2>
+        <ul class="finding-list">
+          <li class="positive">Spec Kit is great at collecting and clarifying requirements, identifying edge cases and inconsistencies in documentation.</li>
+          <li class="neutral">Tech stack and architecture selection process
+            <ul>
+              <li>Your choice is not requested explicitly, but the alternatives are provided in <code>research.md</code>.</li>
+              <li>Solution: conducted separate in-depth research on the tech stack and compared the outputs from GPT and Perplexity. Requested several options, including the pros and cons of each, and asked for a recommended option with the reasoning behind the decision.</li>
+              <li>Alternative solution: build a custom deep-research agent in Copilot. Keep an eye on token consumption, as it may be high.</li>
+            </ul>
+          </li>
+          <li class="note">Native Spec Kit extension for the bug-fixing workflow:<br><a href="https://github.com/github/spec-kit/tree/main/extensions/bug">github.com/github/spec-kit/tree/main/extensions/bug</a></li>
+          <li class="neutral">The Flow Forward approach (immutable specs) is better supported than the Living Spec approach (specs are always kept up to date).<br><a href="https://github.com/github/spec-kit/blob/main/docs/concepts/spec-persistence.md">Spec persistence documentation</a></li>
+          <li class="neutral">Spec Kit is not explicitly helping with UI/UX.
+            <ul>
+              <li>Possible solution: create sketches in Figma, Paint, etc., and attach them to your request.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h3>Not Specific to Spec Kit</h3>
+        <ul class="finding-list">
+          <li class="positive">Ask Copilot to validate the changes:
+            <ul>
+              <li>For web applications, Copilot can verify the changes in the built-in browser in VS Code.</li>
+              <li>Copilot can test HTTP APIs as well.</li>
+            </ul>
+          </li>
+          <li class="negative">High cognitive load when reviewing documents and generated source code.</li>
+          <li class="note">Don't try to implement multiple features in one run, implement them one by one.</li>
+          <li class="neutral">The content of generated documents may vary even across different runs of the same model due to the nondeterministic nature of LLMs.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <footer>Spec Driven Development with Spec Kit</footer>
+</body>
+</html>
